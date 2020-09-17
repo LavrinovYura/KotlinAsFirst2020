@@ -145,7 +145,8 @@ fun rookOrBishopThreatens(
     bishopX: Int, bishopY: Int
 ): Int {
     return if ((kingX == rookX || kingY == rookY) && (abs(kingX - bishopX) ==
-                abs(kingY - bishopY))) 3 else
+                abs(kingY - bishopY))
+    ) 3 else
         if (kingX == rookX || kingY == rookY) 1 else
             if (abs(kingX - bishopX) == abs(kingY - bishopY)) 2 else 0
 }
@@ -190,9 +191,12 @@ fun triangleKind(a: Double, b: Double, c: Double): Int {
  * Если пересечения нет, вернуть -1.
  */
 fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
-    return if (b in c..d && a <= c) b - c else
-        if (b <= d && a > c && d > a) b - a else
-            if (d <= b && a > c && d > a) d - a else
-                if (d < b && a < c && d > a) d - c else -1
+    return when {
+        c in a..b && b <= d -> b - c
+        c in a..b && d <= b -> d - c
+        d in a..b && c <= a -> d - a
+        c <= a && b <= d -> b - a
 
+        else -> -1
+    }
 }
