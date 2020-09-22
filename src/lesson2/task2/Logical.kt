@@ -45,15 +45,14 @@ fun queenThreatens(x1: Int, y1: Int, x2: Int, y2: Int): Boolean = when {
  */
 fun daysInMonth(month: Int, year: Int): Int {
     /* Возвращает 1 если год високосный  */
-    val isLeapYear = if ((year % 4) == 0 && (year % 4000) != 0 &&
-        ((year % 100) != 0 || (year % 400) == 0)
-    ) 1 else 0
+    val isLeapYear = (year % 4) == 0 && (year % 4000) != 0 &&
+            ((year % 100) != 0 || (year % 400) == 0)
     return when (month) {
         1, 3, 5, 7, 8, 10, 12 -> 31
         4, 6, 9, 11 -> 30
         else ->
             when (isLeapYear) {
-                1 -> 29
+                true -> 29
                 else -> 28
             }
     }
@@ -83,6 +82,11 @@ fun circleInside(
  * Вернуть true, если кирпич пройдёт
  */
 fun brickPasses(a: Int, b: Int, c: Int, r: Int, s: Int): Boolean {
+    val s1 = maxOf(a, b, c)
+    val s2 = minOf(a, b, c)
+    val s3 = a + b + c - s1 - s2
+    return maxOf(r, s) >= s3 && minOf(r, s) >= s2
+} /*{
     return when {
         (a <= r && b <= s) || (b <= r && a <= s) -> true
         (c <= r && a <= s) || (c <= s && a <= r) -> true
@@ -91,3 +95,4 @@ fun brickPasses(a: Int, b: Int, c: Int, r: Int, s: Int): Boolean {
         else -> false
     }
 }
+*/

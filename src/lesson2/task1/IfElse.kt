@@ -121,10 +121,16 @@ fun whichRookThreatens(
     rookX1: Int, rookY1: Int,
     rookX2: Int, rookY2: Int
 ): Int {
-    return if ((kingX == rookX1 || kingX == rookX2) && (kingY == rookY1 || kingY == rookY2)) 3
-    else if ((kingX == rookX1 || kingY == rookY1)) 1
-    else if ((kingX == rookX2 || kingY == rookY2)) 2
-    else 0
+    val krx1 = kingX == rookX1
+    val krx2 = kingX == rookX2
+    val kry1 = kingY == rookY1
+    val kry2 = kingY == rookY2
+    return when {
+        (krx1 || krx2) && (kry1 || kry2) -> 3
+        krx1 || kry1 -> 1
+        krx2 || kry2 -> 2
+        else -> 0
+    }
 
 }
 
@@ -144,11 +150,16 @@ fun rookOrBishopThreatens(
     rookX: Int, rookY: Int,
     bishopX: Int, bishopY: Int
 ): Int {
-    return if ((kingX == rookX || kingY == rookY) && (abs(kingX - bishopX) ==
-                abs(kingY - bishopY))
-    ) 3 else
-        if (kingX == rookX || kingY == rookY) 1 else
-            if (abs(kingX - bishopX) == abs(kingY - bishopY)) 2 else 0
+    val krx = kingX == rookX
+    val kry = kingY == rookY
+    val kbx = abs(kingX - bishopX) ==
+            abs(kingY - bishopY)
+    return when {
+        (krx || kry) && (kbx) -> 3
+        krx || kry -> 1
+        kbx -> 2
+        else -> 0
+    }
 }
 
 
@@ -163,11 +174,19 @@ fun rookOrBishopThreatens(
 
 
 fun triangleKind(a: Double, b: Double, c: Double): Int {
-    return if (!(a + b > c && a + c > b && c + b > a)) -1 else
-        if (a > b && a > c) when {
-            sqr(a) < sqr(b) + sqr(c) -> 0
-            sqr(a) == sqr(b) + sqr(c) -> 1
+    return if (!(a + b > c && a + c > b && c + b > a)) -1 else {
+        val s1 = maxOf(a, b, c)
+        val s2 = minOf(a, b, c)
+        val s3 = a + b + c - s1 - s2
+        when {
+            sqr(s1) < sqr(s2) + sqr(s3) -> 0
+            sqr(s1) == sqr(s2) + sqr(s3) -> 1
             else -> 2
+        }
+    }
+}
+/*if (a > b && a > c) when {
+
         }
         else if (b > a && b > c) when {
             sqr(b) < sqr(a) + sqr(c) -> 0
@@ -181,7 +200,7 @@ fun triangleKind(a: Double, b: Double, c: Double): Int {
         }
 
 }
-
+*/
 /**
  * Средняя (3 балла)
  *
@@ -191,7 +210,12 @@ fun triangleKind(a: Double, b: Double, c: Double): Int {
  * Если пересечения нет, вернуть -1.
  */
 fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
-    return when {
+    val maxac = maxOf(a, c)
+    val minbd = minOf(b, d)
+    return if (b >= c && d >= a) abs(maxac - minbd) else -1
+}
+
+/* return when {
         c in a..b && b <= d -> b - c
         c in a..b && d <= b -> d - c
         d in a..b && c <= a -> d - a
@@ -200,3 +224,4 @@ fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
         else -> -1
     }
 }
+*/
