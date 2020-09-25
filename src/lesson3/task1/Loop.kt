@@ -2,7 +2,9 @@
 
 package lesson3.task1
 
+import lesson1.task1.sqr
 import kotlin.math.sqrt
+import kotlin.math.*
 
 // Урок 3: циклы
 // Максимальное количество баллов = 9
@@ -72,7 +74,16 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun digitNumber(n: Int): Int = TODO()
+fun digitNumber(n: Int): Int {
+    var count = 0
+    return if (n == 0) 1 else {
+        var nIn = n
+        while (nIn > 0) {
+            nIn /= 10
+            count++
+        }; return count
+    }
+}
 
 /**
  * Простая (2 балла)
@@ -80,7 +91,16 @@ fun digitNumber(n: Int): Int = TODO()
  * Найти число Фибоначчи из ряда 1, 1, 2, 3, 5, 8, 13, 21, ... с номером n.
  * Ряд Фибоначчи определён следующим образом: fib(1) = 1, fib(2) = 1, fib(n+2) = fib(n) + fib(n+1)
  */
-fun fib(n: Int): Int = TODO()
+fun fib(n: Int): Int {
+    var firstF = 0
+    var secondF = 1
+    var thirdF: Int
+    for (i in 1..n) {
+        thirdF = firstF + secondF
+        firstF = secondF
+        secondF = thirdF
+    }; return firstF
+}
 
 /**
  * Простая (2 балла)
@@ -201,7 +221,17 @@ fun cos(x: Double, eps: Double): Double = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun squareSequenceDigit(n: Int): Int = TODO()
+fun squareSequenceDigit(n: Int): Int {
+    var iterations = 0
+    var digitIn = 0
+    for (digit in 1..n) {
+        digitIn = sqr(digit)
+        iterations += digitNumber(digitIn)
+        if (iterations >= n) break
+    }
+    return ((digitIn / 10.0.pow(iterations - n)) % 10).toInt()
+}
+
 
 /**
  * Сложная (5 баллов)
@@ -212,4 +242,13 @@ fun squareSequenceDigit(n: Int): Int = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun fibSequenceDigit(n: Int): Int = TODO()
+fun fibSequenceDigit(n: Int): Int {
+    var iterations = 0
+    var digitIn = 0
+    for (digit in 1..n) {
+        digitIn = fib(digit)
+        iterations += digitNumber(digitIn)
+        if (iterations >= n) break
+    }
+    return ((digitIn / 10.0.pow(iterations - n)) % 10).toInt()
+}
