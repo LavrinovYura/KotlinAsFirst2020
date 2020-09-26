@@ -76,14 +76,14 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  */
 fun digitNumber(n: Int): Int {
     var count = 0
-    return if (n == 0) 1 else {
-        var nIn = n
-        while (nIn > 0) {
-            nIn /= 10
-            count++
-        }; return count
-    }
+    if (n == 0) return 1
+    var nIn = abs(n)
+    while (nIn > 0) {
+        nIn /= 10
+        count++
+    }; return count
 }
+
 
 /**
  * Простая (2 балла)
@@ -249,6 +249,7 @@ fun fibSequenceDigit(n: Int): Int {
         digitIn = fib(digit)
         iterations += digitNumber(digitIn)
         if (iterations >= n) break
+
     }
     return ((digitIn / 10.0.pow(iterations - n)) % 10).toInt()
 }
