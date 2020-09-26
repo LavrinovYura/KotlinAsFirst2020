@@ -44,7 +44,6 @@ fun queenThreatens(x1: Int, y1: Int, x2: Int, y2: Int): Boolean = when {
  * Вернуть число дней в этом месяце этого года по григорианскому календарю.
  */
 fun daysInMonth(month: Int, year: Int): Int {
-    /* Возвращает 1 если год високосный  */
     val isLeapYear = (year % 4) == 0 && (year % 4000) != 0 &&
             ((year % 100) != 0 || (year % 400) == 0)
     return when (month) {
@@ -86,13 +85,4 @@ fun brickPasses(a: Int, b: Int, c: Int, r: Int, s: Int): Boolean {
     val s2 = minOf(a, b, c)
     val s3 = a + b + c - s1 - s2
     return maxOf(r, s) >= s3 && minOf(r, s) >= s2
-} /*{
-    return when {
-        (a <= r && b <= s) || (b <= r && a <= s) -> true
-        (c <= r && a <= s) || (c <= s && a <= r) -> true
-        (c <= r && b <= s) || (c <= s && b <= r) -> true
-
-        else -> false
-    }
 }
-*/

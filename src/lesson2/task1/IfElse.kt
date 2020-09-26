@@ -121,14 +121,12 @@ fun whichRookThreatens(
     rookX1: Int, rookY1: Int,
     rookX2: Int, rookY2: Int
 ): Int {
-    val krx1 = kingX == rookX1
-    val krx2 = kingX == rookX2
-    val kry1 = kingY == rookY1
-    val kry2 = kingY == rookY2
+    val rookDanger1 = kingX == rookX1 || kingY == rookY1
+    val rookDanger2 = kingX == rookX2 || kingY == rookY2
     return when {
-        (krx1 || krx2) && (kry1 || kry2) -> 3
-        krx1 || kry1 -> 1
-        krx2 || kry2 -> 2
+        rookDanger1 && rookDanger2 -> 3
+        rookDanger1 -> 1
+        rookDanger2 -> 2
         else -> 0
     }
 
@@ -150,14 +148,13 @@ fun rookOrBishopThreatens(
     rookX: Int, rookY: Int,
     bishopX: Int, bishopY: Int
 ): Int {
-    val krx = kingX == rookX
-    val kry = kingY == rookY
-    val kbx = abs(kingX - bishopX) ==
+    val rookDanger = kingX == rookX || kingY == rookY
+    val bishopDanger = abs(kingX - bishopX) ==
             abs(kingY - bishopY)
     return when {
-        (krx || kry) && (kbx) -> 3
-        krx || kry -> 1
-        kbx -> 2
+        rookDanger && bishopDanger -> 3
+        rookDanger -> 1
+        bishopDanger -> 2
         else -> 0
     }
 }
@@ -174,33 +171,17 @@ fun rookOrBishopThreatens(
 
 
 fun triangleKind(a: Double, b: Double, c: Double): Int {
-    return if (!(a + b > c && a + c > b && c + b > a)) -1 else {
-        val s1 = maxOf(a, b, c)
-        val s2 = minOf(a, b, c)
-        val s3 = a + b + c - s1 - s2
-        when {
-            sqr(s1) < sqr(s2) + sqr(s3) -> 0
-            sqr(s1) == sqr(s2) + sqr(s3) -> 1
-            else -> 2
-        }
+    if (!(a + b > c && a + c > b && c + b > a)) return -1
+    val s1 = maxOf(a, b, c)
+    val s2 = minOf(a, b, c)
+    val s3 = a + b + c - s1 - s2
+    return when {
+        sqr(s1) < sqr(s2) + sqr(s3) -> 0
+        sqr(s1) == sqr(s2) + sqr(s3) -> 1
+        else -> 2
     }
 }
-/*if (a > b && a > c) when {
 
-        }
-        else if (b > a && b > c) when {
-            sqr(b) < sqr(a) + sqr(c) -> 0
-            sqr(b) == sqr(a) + sqr(c) -> 1
-            else -> 2
-        }
-        else when {
-            sqr(c) < sqr(b) + sqr(a) -> 0
-            sqr(c) == sqr(b) + sqr(a) -> 1
-            else -> 2
-        }
-
-}
-*/
 /**
  * Средняя (3 балла)
  *
@@ -215,13 +196,3 @@ fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
     return if (b >= c && d >= a) abs(maxac - minbd) else -1
 }
 
-/* return when {
-        c in a..b && b <= d -> b - c
-        c in a..b && d <= b -> d - c
-        d in a..b && c <= a -> d - a
-        c <= a && b <= d -> b - a
-
-        else -> -1
-    }
-}
-*/
