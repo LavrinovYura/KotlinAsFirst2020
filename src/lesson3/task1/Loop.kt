@@ -81,7 +81,8 @@ fun digitNumber(n: Int): Int {
     while (nIn > 0) {
         nIn /= 10
         count++
-    }; return count
+    }
+    return count
 }
 
 
@@ -99,7 +100,8 @@ fun fib(n: Int): Int {
         thirdF = firstF + secondF
         firstF = secondF
         secondF = thirdF
-    }; return firstF
+    }
+    return firstF
 }
 
 /**

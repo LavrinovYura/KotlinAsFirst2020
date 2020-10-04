@@ -171,11 +171,11 @@ fun rookOrBishopThreatens(
 
 
 fun triangleKind(a: Double, b: Double, c: Double): Int {
-    if (!(a + b > c && a + c > b && c + b > a)) return -1
     val s1 = maxOf(a, b, c)
     val s2 = minOf(a, b, c)
     val s3 = a + b + c - s1 - s2
     return when {
+        s1 > s2 + s3 -> -1
         sqr(s1) < sqr(s2) + sqr(s3) -> 0
         sqr(s1) == sqr(s2) + sqr(s3) -> 1
         else -> 2
