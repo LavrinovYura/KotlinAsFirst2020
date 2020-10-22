@@ -379,7 +379,6 @@ fun russian(n: Int): String {
                 list[indexInList - 1] == "десять" -> {
                     list[indexInList - 1] = error[currentNum]
                     indexInList--
-                    println(list)
                 }
 
                 else -> list += units[currentNum]
