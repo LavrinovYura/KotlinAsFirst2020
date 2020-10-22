@@ -395,7 +395,6 @@ fun russian(n: Int): String {
 
             }
         }
-        println(list)
         if (current == 4) {
             list += when {
                 list[indexInList] == error[currentNum] -> {
