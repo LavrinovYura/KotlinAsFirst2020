@@ -306,7 +306,7 @@ fun roman(n: Int): String {
     var current = digitNumber(n)
     while (current > 0) {
         val counter = reverseN % 10
-        if (counter == 0) break else
+        if (counter == 0) else
             when (current) {
                 4 -> string += thousands[counter]
                 3 -> string += hundreeds[counter]
