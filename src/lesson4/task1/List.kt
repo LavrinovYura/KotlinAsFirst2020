@@ -374,10 +374,14 @@ fun russian(n: Int): String {
 
                 digitNumber(n) == 1 -> list += units[currentNum]
 
+                digitNumber(n) == 4 && current == 4 -> list += units[currentNum]
+
                 list[indexInList - 1] == "десять" -> {
                     list[indexInList - 1] = error[currentNum]
                     indexInList--
+                    println(list)
                 }
+
                 else -> list += units[currentNum]
             }
 
@@ -392,6 +396,7 @@ fun russian(n: Int): String {
 
             }
         }
+        println(list)
         if (current == 4) {
             list += when {
                 list[indexInList] == error[currentNum] -> {
