@@ -4,9 +4,8 @@ package lesson4.task1
 
 import lesson1.task1.discriminant
 import lesson3.task1.digitNumber
-import kotlin.math.pow
 import kotlin.math.sqrt
-import kotlin.collections.listOf as listOf1
+import kotlin.collections.listOf
 
 // Урок 4: списки
 // Максимальное количество баллов = 12
@@ -20,12 +19,12 @@ import kotlin.collections.listOf as listOf1
  */
 fun sqRoots(y: Double) =
     when {
-        y < 0 -> listOf1()
-        y == 0.0 -> listOf1(0.0)
+        y < 0 -> listOf()
+        y == 0.0 -> listOf(0.0)
         else -> {
             val root = sqrt(y)
             // Результат!
-            listOf1(-root, root)
+            listOf(-root, root)
         }
     }
 
@@ -37,11 +36,11 @@ fun sqRoots(y: Double) =
  */
 fun biRoots(a: Double, b: Double, c: Double): List<Double> {
     if (a == 0.0) {
-        return if (b == 0.0) listOf1()
+        return if (b == 0.0) listOf()
         else sqRoots(-c / b)
     }
     val d = discriminant(a, b, c)
-    if (d < 0.0) return listOf1()
+    if (d < 0.0) return listOf()
     if (d == 0.0) return sqRoots(-b / (2 * a))
     val y1 = (-b + sqrt(d)) / (2 * a)
     val y2 = (-b - sqrt(d)) / (2 * a)
@@ -123,21 +122,16 @@ fun buildSumExample(list: List<Int>) = list.joinToString(separator = " + ", post
  * по формуле abs = sqrt(a1^2 + a2^2 + ... + aN^2).
  * Модуль пустого вектора считать равным 0.0.
  */
-fun abs(v: List<Double>): Double {
-    if (v.isEmpty()) return 0.0
-    val listABS = v.map { it * it }
-    return sqrt(listABS.sum())
-}
+fun abs(v: List<Double>): Double = sqrt(v.map { it * it }.sum())
+
 
 /**
  * Простая (2 балла)
  *
  * Рассчитать среднее арифметическое элементов списка list. Вернуть 0.0, если список пуст
  */
-fun mean(list: List<Double>): Double {
-    return if (list.isEmpty()) 0.0 else
-        list.sum() / list.size
-}
+fun mean(list: List<Double>): Double = if (list.isEmpty()) 0.0 else list.sum() / list.size
+
 
 /**
  * Средняя (3 балла)
@@ -148,7 +142,6 @@ fun mean(list: List<Double>): Double {
  * Обратите внимание, что данная функция должна изменять содержание списка list, а не его копии.
  */
 fun center(list: MutableList<Double>): MutableList<Double> {
-    if (list.isEmpty()) return list
     val aMean = mean(list)
     for (i in 0 until list.size) {
         list[i] -= aMean
@@ -164,7 +157,6 @@ fun center(list: MutableList<Double>): MutableList<Double> {
  * C = a1b1 + a2b2 + ... + aNbN. Произведение пустых векторов считать равным 0.
  */
 fun times(a: List<Int>, b: List<Int>): Int {
-    if (a.isEmpty() && b.isEmpty()) return 0
     var size = 0
     for (i in a.indices) {
         size += a[i] * b[i]
@@ -181,10 +173,11 @@ fun times(a: List<Int>, b: List<Int>): Int {
  * Значение пустого многочлена равно 0 при любом x.
  */
 fun polynom(p: List<Int>, x: Int): Int {
-    if (p.isEmpty()) return 0
     var polySum = 0
+    var safeX = 1
     for (i in p.indices) {
-        polySum += (p[i] * (x.toDouble().pow(i))).toInt()
+        polySum += p[i] * safeX
+        safeX *= x
     }
     return polySum
 }
@@ -200,13 +193,10 @@ fun polynom(p: List<Int>, x: Int): Int {
  * Обратите внимание, что данная функция должна изменять содержание списка list, а не его копии.
  */
 fun accumulate(list: MutableList<Int>): MutableList<Int> {
-    if (list.isEmpty() || list.size == 1) return list
-    val list2 = mutableListOf<Int>()
-    list2 += list[0]
-    for (i in 1 until list.size) {
-        val a = list2.sum()
-        list2 += list[i]
-        list[i] += a
+    var a = 0
+    for (i in list.indices) {
+        a += list[i]
+        list[i] = a
     }
     return list
 }
@@ -297,22 +287,22 @@ fun decimalFromString(str: String, base: Int): Int = TODO()
  */
 
 fun roman(n: Int): String {
-    val units = kotlin.collections.listOf("", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX")
-    val tens = kotlin.collections.listOf("", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC")
-    val hundreeds = kotlin.collections.listOf("", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM")
-    val thousands = kotlin.collections.listOf("", "M", "MM", "MMM")
+    val units = listOf("", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX")
+    val tens = listOf("", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC")
+    val hundreeds = listOf("", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM")
+    val thousands = listOf("", "M", "MM", "MMM")
     var reverseN = reverseDigit(n)
     var string = ""
     var current = digitNumber(n)
     while (current > 0) {
         val counter = reverseN % 10
-        if (counter == 0) else
-            when (current) {
-                4 -> string += thousands[counter]
-                3 -> string += hundreeds[counter]
-                2 -> string += tens[counter]
-                1 -> string += units[counter]
-            }
+        string += when (current) {
+            4 -> thousands[counter]
+            3 -> hundreeds[counter]
+            2 -> tens[counter]
+            1 -> units[counter]
+            else -> break
+        }
         current--
         reverseN /= 10
     }
@@ -328,19 +318,19 @@ fun roman(n: Int): String {
  */
 
 fun russian(n: Int): String {
-    val units = listOf1(
+    val units = listOf(
         "", "один", "два", "три", "четыре",
         "пять", "шесть", "семь", "восемь", "девять"
     )
-    val tens = listOf1(
+    val tens = listOf(
         "", "десять", "двадцать", "тридцать", "сорок", "пятьдесят",
         "шестьдесят", "семьдесят", "восемьдесят", "девяносто"
     )
-    val hundreds = listOf1(
+    val hundreds = listOf(
         "", "сто", "двести", "триста", "четыреста",
         "пятьсот", "шестьсот", "семьсот", "восемьсот", "девятьсот"
     )
-    val error = listOf1(
+    val error = listOf(
         "", "одиннадцать", "двенадцать", "тринадцать", "четырнадцать", "пятнадцать",
         "шестнадцать", "семнадцать", "восемнадцать", "девятнадцать"
     )
@@ -419,10 +409,8 @@ fun russian(n: Int): String {
 fun reverseDigit(n: Int): Int {
     var result = 0
     var nIn = n
-    var safe: Int
     while (nIn > 0) {
-        safe = nIn % 10
-        result = result * 10 + safe
+        result = result * 10 + nIn % 10
         nIn /= 10
     }
     return result
