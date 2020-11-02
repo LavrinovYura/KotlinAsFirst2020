@@ -101,11 +101,8 @@ fun buildWordSet(text: List<String>): MutableSet<String> {
 fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
     val exams = mutableMapOf<Int, MutableList<String>>()
     for ((student, grade) in grades) {
-        if (exams[grade] == null) {
-            exams[grade] = mutableListOf()
-        }
-        exams[grade]?.plusAssign(student)
-
+        exams.getOrPut(grade) { mutableListOf() }
+        exams[grade]!!.add(student)
     }
     return exams
 }
@@ -123,7 +120,11 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
 fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
     var contain = true
     for ((key, value) in a) {
-        contain = b.containsKey(key) && b[key] == value
+        if (key in b && b[key] == value) contain = true
+        else {
+            contain = false
+            break
+        }
     }
     return contain
 }
@@ -155,12 +156,11 @@ fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>) {
  * т. е. whoAreInBoth(listOf("Марат", "Семён, "Марат"), listOf("Марат", "Марат")) == listOf("Марат")
  */
 fun whoAreInBoth(a: List<String>, b: List<String>): List<String> {
-    a.toSet()
-    b.toSet()
     val result = mutableListOf<String>()
     for (name in a) {
-        if (b.contains(name)) result += name
+        if (name in b && name !in result) result += name
     }
+    println(result)
     return result
 }
 
@@ -316,12 +316,13 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
+    val res = mutableListOf<Int>()
     for (i in list.indices) {
-        for (k in 1 until list.size) {
-            if (list[i] + list[k] == number && i != k) return Pair(i, k)
-        }
+        if (number - list[i] in list && number - list[i] != list[i])
+            res.add(i)
+
     }
-    return Pair(-1, -1)
+    return if (res.isEmpty()) Pair(-1, -1) else Pair(res[0], res[1])
 }
 
 /**
@@ -357,8 +358,8 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     }
     val array = Array(treasure.size + 1) { Array(capacity + 1) { 0 } }
     for (i in 1..treasure.size) {
-        for (j in 1..capacity) {
-            if (weight[i - 1] <= j)
+        for (j in 0..capacity) {
+            if (weight[i - 1] < j)
                 array[i][j] = max(array[i - 1][j], array[i - 1][j - weight[i - 1]] + price[i - 1])
             else
                 array[i][j] = array[i - 1][j]
