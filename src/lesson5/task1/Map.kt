@@ -2,6 +2,7 @@
 
 package lesson5.task1
 
+import ru.spbstu.wheels.sorted
 import kotlin.math.max
 
 // Урок 5: ассоциативные массивы и множества
@@ -316,13 +317,14 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
-    val res = mutableListOf<Int>()
+    val res = mutableMapOf<Int, Int>()
     for (i in list.indices) {
-        if (number - list[i] in list && number - list[i] != list[i])
-            res.add(i)
-
+        if (!res.containsKey(number - list[i]))
+            res += list[i] to i
+        else
+            return Pair(i, res[number - list[i]]!!).sorted()
     }
-    return if (res.isEmpty()) Pair(-1, -1) else Pair(res[0], res[1])
+    return Pair(-1, -1)
 }
 
 /**
@@ -358,8 +360,8 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     }
     val array = Array(treasure.size + 1) { Array(capacity + 1) { 0 } }
     for (i in 1..treasure.size) {
-        for (j in 0..capacity) {
-            if (weight[i - 1] < j)
+        for (j in 1..capacity) {
+            if (weight[i - 1] <= j)
                 array[i][j] = max(array[i - 1][j], array[i - 1][j - weight[i - 1]] + price[i - 1])
             else
                 array[i][j] = array[i - 1][j]
