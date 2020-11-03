@@ -1,8 +1,7 @@
-@file:Suppress("UNUSED_PARAMETER", "ConvertCallChainIntoSequence")
+@file:Suppress("UNUSED_PARAMETER", "ConvertCallChainIntoSequence", "UNCHECKED_CAST")
 
 package lesson5.task1
 
-import ru.spbstu.wheels.sorted
 import kotlin.math.max
 
 // Урок 5: ассоциативные массивы и множества
@@ -102,8 +101,7 @@ fun buildWordSet(text: List<String>): MutableSet<String> {
 fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
     val exams = mutableMapOf<Int, MutableList<String>>()
     for ((student, grade) in grades) {
-        exams.getOrPut(grade) { mutableListOf() }
-        exams[grade]!!.add(student)
+        exams.getOrPut(grade) { mutableListOf() }.add(student)
     }
     return exams
 }
@@ -119,15 +117,12 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
  *   containsIn(mapOf("a" to "z"), mapOf("a" to "zee", "b" to "sweet")) -> false
  */
 fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
-    var contain = true
+    var chek = false
     for ((key, value) in a) {
-        if (key in b && b[key] == value) contain = true
-        else {
-            contain = false
-            break
-        }
+        if (key in b && b[key] == value) chek = true else
+            return false
     }
-    return contain
+    return chek
 }
 
 /**
@@ -146,7 +141,7 @@ fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
  */
 fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>) {
     for ((key, value) in b)
-        if (a.containsKey(key) && a[key] == value) a.remove(key)
+        if (key in a && a[key] == value) a.remove(key)
 }
 
 /**
@@ -157,12 +152,11 @@ fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>) {
  * т. е. whoAreInBoth(listOf("Марат", "Семён, "Марат"), listOf("Марат", "Марат")) == listOf("Марат")
  */
 fun whoAreInBoth(a: List<String>, b: List<String>): List<String> {
-    val result = mutableListOf<String>()
-    for (name in a) {
-        if (name in b && name !in result) result += name
+    val res = mutableListOf<String>()
+    for (name in a.toSet()) {
+        if (name in b.toSet()) res += name
     }
-    println(result)
-    return result
+    return res.toList()
 }
 
 
@@ -188,7 +182,7 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
     result.putAll(mapB)
     result.putAll(mapA)
     for ((service, number) in mapB) {
-        if (result.containsKey(service) && result[service] != number)
+        if (service in result && result[service] != number)
             result[service] += ", $number"
     }
     return result
@@ -318,11 +312,11 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     val res = mutableMapOf<Int, Int>()
-    for (i in list.indices) {
-        if (!res.containsKey(number - list[i]))
-            res += list[i] to i
+    for ((i, value) in list.withIndex()) {
+        if (number - value !in res)
+            res += value to i
         else
-            return Pair(i, res[number - list[i]]!!).sorted()
+            return Pair(i, res[number - value]) as Pair<Int, Int>
     }
     return Pair(-1, -1)
 }
