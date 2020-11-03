@@ -117,12 +117,10 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
  *   containsIn(mapOf("a" to "z"), mapOf("a" to "zee", "b" to "sweet")) -> false
  */
 fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
-    var contain = true
     for ((key, value) in a) {
-        if (key in b && b[key] == value) contain = true
-        else return false
+        if (!(key in b && b[key] == value)) return false
     }
-    return contain
+    return true
 }
 
 /**
@@ -153,10 +151,12 @@ fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>) {
  */
 fun whoAreInBoth(a: List<String>, b: List<String>): List<String> {
     val res = mutableListOf<String>()
-    for (name in a.toSet()) {
-        if (name in b.toSet()) res += name
+    val setB = b.toSet()
+    val setA = a.toSet()
+    for (name in setA) {
+        if (name in setB) res += name
     }
-    return res.toList()
+    return res
 }
 
 
@@ -311,12 +311,15 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
-    val res = mutableMapOf<Int, Int>()
+    val valToIndex = mutableMapOf<Int, Int>()
+    var safe: Int
     for ((i, value) in list.withIndex()) {
-        if (number - value !in res)
-            res += value to i
-        else
-            return Pair( res[number - value], i) as Pair<Int, Int>
+        if (number - value in valToIndex) {
+            safe = valToIndex[number - value] ?: -1
+            if (safe != -1) return Pair(safe, i)
+        } else {
+            valToIndex += value to i
+        }
     }
     return Pair(-1, -1)
 }
