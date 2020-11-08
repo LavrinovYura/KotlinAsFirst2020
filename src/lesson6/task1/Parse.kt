@@ -2,6 +2,8 @@
 
 package lesson6.task1
 
+import lesson2.task2.daysInMonth
+
 // Урок 6: разбор строк, исключения
 // Максимальное количество баллов = 13
 // Рекомендуемое количество баллов = 11
@@ -74,7 +76,21 @@ fun main() {
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30.02.2009) считается неверными
  * входными данными.
  */
-fun dateStrToDigit(str: String): String = TODO()
+fun dateStrToDigit(str: String): String {
+    val mounts = mapOf(
+        "января" to 1, "феварля" to 2, "марта" to 3,
+        "апреля" to 4, "мая" to 5, "июня" to 6,
+        "июля" to 7, "августа" to 8, "сентября" to 9,
+        "октября" to 10, "ноября" to 11, "декабря" to 12
+    )
+    val parts = str.split(" ")
+    if (parts.size != 3) return ""
+    val mount = mounts[parts[1]] ?: return ""
+    val year = parts[2].toInt()
+    val day = parts[0].toInt()
+    return if (daysInMonth(mount, year) < day) ""
+    else String.format("%02d.%02d.%02d", day, mount, year)
+}
 
 /**
  * Средняя (4 балла)
@@ -127,7 +143,12 @@ fun bestLongJump(jumps: String): Int = TODO()
  * При нарушении формата входной строки, а также в случае отсутствия удачных попыток,
  * вернуть -1.
  */
-fun bestHighJump(jumps: String): Int = TODO()
+fun bestHighJump(jumps: String): Int {
+    return if ("$jumps ".matches(Regex("""(\d+\s[%\-+]*\s)*""")))
+        Regex("""\d+\s%*\+""").findAll(jumps).maxOfOrNull { it.value.filter { it.isDigit() }.toInt() } ?: -1
+    else -1
+}
+
 
 /**
  * Сложная (6 баллов)
@@ -213,4 +234,69 @@ fun fromRoman(roman: String): Int = TODO()
  * IllegalArgumentException должен бросаться даже если ошибочная команда не была достигнута в ходе выполнения.
  *
  */
-fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> = TODO()
+fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
+    if (!commands.matches(Regex("""[><+\- \[\]]*"""))) throw java.lang.IllegalArgumentException()
+    var bracketCount = 0
+    for (command in commands) {
+        if (command == '[') bracketCount++
+        if (command == ']') bracketCount--
+    }
+    if (bracketCount != 0) throw java.lang.IllegalArgumentException()
+    val list = MutableList(cells) { 0 }
+    var k = 0
+    val listB = MutableList(commands.length) { 0 }
+    var time = 0
+    var current = cells / 2
+    var char = 0
+    while (char < commands.length && time < limit) {
+        when (commands[char]) {
+            '+' -> {
+                list[current]++
+                char++
+            }
+            '-' -> {
+                list[current]--
+                char++
+            }
+            '>' -> {
+                if (cells == current) throw IllegalStateException()
+                current++
+                char++
+            }
+            '<' -> {
+                if (current == 0) throw IllegalStateException()
+                current--
+                char++
+            }
+            '[' -> {
+                if (list[current] != 0) {
+                    k++
+                    listB[k] = char
+                    char++
+                } else {
+                    k++
+                    val safe = k
+                    listB[k] = char
+                    while (k != safe - 1) {
+                        char++
+                        if (commands[char] == '[') k++
+                        if (commands[char] == ']') k--
+                    }
+                    char++
+                }
+            }
+            ']' -> if (list[current] != 0) {
+                char = listB[k] + 1
+            } else {
+                k--
+                char++
+            }
+
+            ' ' -> {
+                char++
+            }
+        }
+        time++
+    }
+    return list
+}
