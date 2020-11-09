@@ -87,6 +87,8 @@ fun lengthInMeters(sagenes: Int, arshins: Int, vershoks: Int) =
 fun angleInRadian(deg: Int, min: Int, sec: Int) =
     deg * PI / 180 + min * PI / 180 / 60 + sec * PI / 180 / 3600
 
+
+
 /**
  * Тривиальная (1 балл)
  *
@@ -122,7 +124,7 @@ fun travelMinutes(hoursDepart: Int, minutesDepart: Int, hoursArrive: Int, minute
  * Сколько денег будет на счету через 3 года (с учётом сложных процентов)?
  * Например, 100 рублей под 10% годовых превратятся в 133.1 рубля
  */
-fun accountInThreeYears(initial: Int, percent: Int): Double =
+fun accountInThreeYears(initial: Int, percent: Int) =
     (1 + 0.01 * percent).pow(3.0) * initial
 
 
