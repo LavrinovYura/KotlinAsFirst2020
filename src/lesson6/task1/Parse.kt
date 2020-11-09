@@ -78,18 +78,19 @@ fun main() {
  */
 fun dateStrToDigit(str: String): String {
     val mounts = mapOf(
-        "января" to 1, "феварля" to 2, "марта" to 3,
+        "января" to 1, "февраля" to 2, "марта" to 3,
         "апреля" to 4, "мая" to 5, "июня" to 6,
         "июля" to 7, "августа" to 8, "сентября" to 9,
         "октября" to 10, "ноября" to 11, "декабря" to 12
     )
     val parts = str.split(" ")
     if (parts.size != 3) return ""
-    val mount = mounts[parts[1]] ?: return ""
+    val mounth = mounts[parts[1]] ?: return ""
     val year = parts[2].toInt()
     val day = parts[0].toInt()
-    return if (daysInMonth(mount, year) < day && year <= 0) ""
-    else String.format("%02d.%02d.%d", day, mount, year)
+    println(daysInMonth(mounth, year))
+    return if (daysInMonth(mounth, year) < day && 0 <= year) ""
+    else String.format("%02d.%02d.%d", day, mounth, year)
 }
 
 /**
@@ -239,7 +240,7 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
     var bracketCount = 0
     for (command in commands) {
         if (command == '[') bracketCount++
-        if (command == ']') bracketCount--
+        if (command == ']') if (bracketCount > 0) bracketCount-- else throw java.lang.IllegalArgumentException()
     }
     if (bracketCount != 0) throw java.lang.IllegalArgumentException()
     val list = MutableList(cells) { 0 }
