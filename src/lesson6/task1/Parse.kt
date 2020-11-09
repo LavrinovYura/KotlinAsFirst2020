@@ -88,8 +88,8 @@ fun dateStrToDigit(str: String): String {
     val mount = mounts[parts[1]] ?: return ""
     val year = parts[2].toInt()
     val day = parts[0].toInt()
-    return if (daysInMonth(mount, year) < day) ""
-    else String.format("%02d.%02d.%02d", day, mount, year)
+    return if (daysInMonth(mount, year) < day && year > 0) ""
+    else String.format("%02d.%02d.%d", day, mount, year)
 }
 
 /**
@@ -259,7 +259,7 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
                 char++
             }
             '>' -> {
-                if (cells == current) throw IllegalStateException()
+                if (cells == current + 1) throw IllegalStateException()
                 current++
                 char++
             }
