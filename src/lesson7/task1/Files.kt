@@ -351,38 +351,41 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
             safeP = 0
         }
         loop@ for (char in line) {
-            if (char != '*' && counter > 0) {
+            if (char == '*') {
+                counter++
+                continue@loop
+            } else if (counter != 0 && char != '*') {
                 when (counter) {
                     1 -> {
-                        counter = if (counterI == 1 && (counterBI == 2 || counterBI == 1)) {
+                        if (counterI == 1 && (counterBI == 2 || counterBI == 1)) {
                             writer.write("</i>")
                             counterI--
                             counterBI--
-                            0
+                            counter = 0
                         } else if (counterI == 1) {
                             writer.write("</i>")
                             counterI--
-                            0
+                            counter = 0
                         } else {
                             writer.write("<i>")
                             counterI++
-                            0
+                            counter = 0
                         }
                     }
                     2 -> {
-                        counter = if (counterB == 1 && (counterBI == 2 || counterBI == 1)) {
+                        if (counterB == 1 && (counterBI == 2 || counterBI == 1)) {
                             writer.write("</b>")
                             counterB--
                             counterBI--
-                            0
+                            counter = 0
                         } else if (counterB == 1) {
                             writer.write("</b>")
                             counterB--
-                            0
+                            counter = 0
                         } else {
                             writer.write("<b>")
                             counterB++
-                            0
+                            counter = 0
                         }
                     }
                     3 -> {
@@ -435,10 +438,6 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                     counterS = 0
                     continue@loop
                 }
-                continue@loop
-            }
-            if (char == '*') {
-                counter++
                 continue@loop
             }
             writer.write("$char")
