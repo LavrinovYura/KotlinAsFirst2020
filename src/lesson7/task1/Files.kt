@@ -85,10 +85,11 @@ fun deleteMarked(inputName: String, outputName: String) {
  */
 fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
     val result = mutableMapOf<String, Int>()
-    for (word in substrings) result[word] = 0
+    val subs = substrings.toSet()
+    for (word in subs) result[word] = 0
 
     for (line in File(inputName).readLines()) {
-        for (word in substrings)
+        for (word in subs)
             if (line.toLowerCase().contains(word.toLowerCase())) {
                 for (i in line.indices) {
                     var counter = 0
@@ -330,52 +331,58 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
  */
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
     val writer = File(outputName).bufferedWriter()
-    var counter = 0
-    var counterS = 0
-    var counterI = 0
-    var counterB = 0
-    var counterBI = 0
     writer.write("<html>")
     writer.write("<body>")
     writer.write("<p>")
+    var safeP = 0
     for (line in File(inputName).readLines()) {
+        var counter = 0
+        var counterS = 0
+        var counterI = 0
+        var counterB = 0
+        var counterBI = 0
         if (line.isEmpty()) {
+            safeP++
+            continue
+        }
+        if (safeP != 0) {
             writer.write("</p>")
             writer.write("<p>")
+            safeP = 0
         }
         loop@ for (char in line) {
             if (char != '*' && counter > 0) {
                 when (counter) {
                     1 -> {
-                        if (counterI == 1 && (counterBI == 2 || counterBI == 1)) {
-                            writer.write( "</i>")
+                        counter = if (counterI == 1 && (counterBI == 2 || counterBI == 1)) {
+                            writer.write("</i>")
                             counterI--
                             counterBI--
-                            counter = 0
+                            0
                         } else if (counterI == 1) {
-                            writer.write( "</i>")
+                            writer.write("</i>")
                             counterI--
-                            counter = 0
+                            0
                         } else {
                             writer.write("<i>")
                             counterI++
-                            counter = 0
+                            0
                         }
                     }
                     2 -> {
-                        if (counterB == 1 && (counterBI == 2 || counterBI == 1)) {
+                        counter = if (counterB == 1 && (counterBI == 2 || counterBI == 1)) {
                             writer.write("</b>")
                             counterB--
                             counterBI--
-                            counter = 0
+                            0
                         } else if (counterB == 1) {
                             writer.write("</b>")
                             counterB--
-                            counter = 0
+                            0
                         } else {
-                            writer.write( "<b>")
+                            writer.write("<b>")
                             counterB++
-                            counter = 0
+                            0
                         }
                     }
                     3 -> {
@@ -394,13 +401,13 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                                 counter = 0
                             }
                             counterBI == 0 && counterB == 1 -> {
-                                writer.write( "</b><i>")
+                                writer.write("</b><i>")
                                 counterBI = 1
                                 counterI = 0
                                 counter = 0
                             }
                             counterBI == 2 -> {
-                                writer.write( "</b></i>")
+                                writer.write("</b></i>")
                                 counterBI = 0
                                 counter = 0
                             }
