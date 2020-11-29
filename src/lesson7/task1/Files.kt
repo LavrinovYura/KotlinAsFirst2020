@@ -335,12 +335,13 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     writer.write("<body>")
     writer.write("<p>")
     var safeP = 0
+    var counter = 0
+    var counterS = 0
+    var counterI = 0
+    var counterB = 0
+    var counterBI = 0
     for (line in File(inputName).readLines()) {
-        var counter = 0
-        var counterS = 0
-        var counterI = 0
-        var counterB = 0
-        var counterBI = 0
+
         if (line.isEmpty()) {
             safeP++
             continue
