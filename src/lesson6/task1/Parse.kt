@@ -2,6 +2,7 @@
 
 package lesson6.task1
 
+
 // Урок 6: разбор строк, исключения
 // Максимальное количество баллов = 13
 // Рекомендуемое количество баллов = 11
@@ -127,7 +128,12 @@ fun bestLongJump(jumps: String): Int = TODO()
  * При нарушении формата входной строки, а также в случае отсутствия удачных попыток,
  * вернуть -1.
  */
-fun bestHighJump(jumps: String): Int = TODO()
+fun bestHighJump(jumps: String): Int {
+    return if ("$jumps ".matches(Regex("""(\d+\s[%\-+]*\s)*""")))
+        Regex("""\d+\s%*\+""").findAll(jumps).maxOfOrNull { it.value.filter { it.isDigit() }.toInt() } ?: -1
+    else -1
+}
+
 
 /**
  * Сложная (6 баллов)
@@ -213,4 +219,69 @@ fun fromRoman(roman: String): Int = TODO()
  * IllegalArgumentException должен бросаться даже если ошибочная команда не была достигнута в ходе выполнения.
  *
  */
-fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> = TODO()
+fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
+    if (!commands.matches(Regex("""[><+\- \[\]]*"""))) throw java.lang.IllegalArgumentException()
+    var bracketCount = 0
+    for (command in commands) {
+        if (command == '[') bracketCount++
+        if (command == ']') if (bracketCount > 0) bracketCount-- else throw java.lang.IllegalArgumentException()
+    }
+    if (bracketCount != 0) throw java.lang.IllegalArgumentException()
+    val list = MutableList(cells) { 0 }
+    var k = 0
+    val listB = MutableList(commands.length) { 0 }
+    var time = 0
+    var current = cells / 2
+    var char = 0
+    while (char < commands.length && time < limit) {
+        when (commands[char]) {
+            '+' -> {
+                list[current]++
+                char++
+            }
+            '-' -> {
+                list[current]--
+                char++
+            }
+            '>' -> {
+                if (cells == current + 1) throw IllegalStateException()
+                current++
+                char++
+            }
+            '<' -> {
+                if (current == 0) throw IllegalStateException()
+                current--
+                char++
+            }
+            '[' -> {
+                if (list[current] != 0) {
+                    k++
+                    listB[k] = char
+                    char++
+                } else {
+                    k++
+                    val safe = k
+                    listB[k] = char
+                    while (k != safe - 1) {
+                        char++
+                        if (commands[char] == '[') k++
+                        if (commands[char] == ']') k--
+                    }
+                    char++
+                }
+            }
+            ']' -> if (list[current] != 0) {
+                char = listB[k] + 1
+            } else {
+                k--
+                char++
+            }
+
+            ' ' -> {
+                char++
+            }
+        }
+        time++
+    }
+    return list
+}

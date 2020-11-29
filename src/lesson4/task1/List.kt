@@ -3,7 +3,9 @@
 package lesson4.task1
 
 import lesson1.task1.discriminant
+import lesson3.task1.digitNumber
 import kotlin.math.sqrt
+import kotlin.collections.listOf
 
 // Урок 4: списки
 // Максимальное количество баллов = 12
@@ -120,14 +122,16 @@ fun buildSumExample(list: List<Int>) = list.joinToString(separator = " + ", post
  * по формуле abs = sqrt(a1^2 + a2^2 + ... + aN^2).
  * Модуль пустого вектора считать равным 0.0.
  */
-fun abs(v: List<Double>): Double = TODO()
+fun abs(v: List<Double>): Double = sqrt(v.map { it * it }.sum())
+
 
 /**
  * Простая (2 балла)
  *
  * Рассчитать среднее арифметическое элементов списка list. Вернуть 0.0, если список пуст
  */
-fun mean(list: List<Double>): Double = TODO()
+fun mean(list: List<Double>): Double = if (list.isEmpty()) 0.0 else list.sum() / list.size
+
 
 /**
  * Средняя (3 балла)
@@ -137,7 +141,13 @@ fun mean(list: List<Double>): Double = TODO()
  *
  * Обратите внимание, что данная функция должна изменять содержание списка list, а не его копии.
  */
-fun center(list: MutableList<Double>): MutableList<Double> = TODO()
+fun center(list: MutableList<Double>): MutableList<Double> {
+    val aMean = mean(list)
+    for (i in 0 until list.size) {
+        list[i] -= aMean
+    }
+    return list
+}
 
 /**
  * Средняя (3 балла)
@@ -146,7 +156,13 @@ fun center(list: MutableList<Double>): MutableList<Double> = TODO()
  * представленные в виде списков a и b. Скалярное произведение считать по формуле:
  * C = a1b1 + a2b2 + ... + aNbN. Произведение пустых векторов считать равным 0.
  */
-fun times(a: List<Int>, b: List<Int>): Int = TODO()
+fun times(a: List<Int>, b: List<Int>): Int {
+    var size = 0
+    for (i in a.indices) {
+        size += a[i] * b[i]
+    }
+    return size
+}
 
 /**
  * Средняя (3 балла)
@@ -156,7 +172,15 @@ fun times(a: List<Int>, b: List<Int>): Int = TODO()
  * Коэффициенты многочлена заданы списком p: (p0, p1, p2, p3, ..., pN).
  * Значение пустого многочлена равно 0 при любом x.
  */
-fun polynom(p: List<Int>, x: Int): Int = TODO()
+fun polynom(p: List<Int>, x: Int): Int {
+    var polySum = 0
+    var safeX = 1
+    for (i in p.indices) {
+        polySum += p[i] * safeX
+        safeX *= x
+    }
+    return polySum
+}
 
 /**
  * Средняя (3 балла)
@@ -168,7 +192,14 @@ fun polynom(p: List<Int>, x: Int): Int = TODO()
  *
  * Обратите внимание, что данная функция должна изменять содержание списка list, а не его копии.
  */
-fun accumulate(list: MutableList<Int>): MutableList<Int> = TODO()
+fun accumulate(list: MutableList<Int>): MutableList<Int> {
+    var a = 0
+    for (i in list.indices) {
+        a += list[i]
+        list[i] = a
+    }
+    return list
+}
 
 /**
  * Средняя (3 балла)
@@ -177,7 +208,18 @@ fun accumulate(list: MutableList<Int>): MutableList<Int> = TODO()
  * Результат разложения вернуть в виде списка множителей, например 75 -> (3, 5, 5).
  * Множители в списке должны располагаться по возрастанию.
  */
-fun factorize(n: Int): List<Int> = TODO()
+fun factorize(n: Int): List<Int> {
+    var digitIn = n
+    val list = mutableListOf<Int>()
+    for (i in 2..(sqrt(n.toDouble()).toInt())) {
+        while (digitIn % i == 0 && digitIn != 1) {
+            list.add(i)
+            digitIn /= i
+        }
+    }
+    if (digitIn != 1) list.add(digitIn)
+    return list
+}
 
 /**
  * Сложная (4 балла)
@@ -186,7 +228,9 @@ fun factorize(n: Int): List<Int> = TODO()
  * Результат разложения вернуть в виде строки, например 75 -> 3*5*5
  * Множители в результирующей строке должны располагаться по возрастанию.
  */
-fun factorizeToString(n: Int): String = TODO()
+fun factorizeToString(n: Int): String =
+    factorize(n).joinToString(separator = "*")
+
 
 /**
  * Средняя (3 балла)
@@ -241,7 +285,29 @@ fun decimalFromString(str: String, base: Int): Int = TODO()
  * 90 = XC, 100 = C, 400 = CD, 500 = D, 900 = CM, 1000 = M.
  * Например: 23 = XXIII, 44 = XLIV, 100 = C
  */
-fun roman(n: Int): String = TODO()
+
+fun roman(n: Int): String {
+    val units = listOf("", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX")
+    val tens = listOf("", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC")
+    val hundreeds = listOf("", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM")
+    val thousands = listOf("", "M", "MM", "MMM")
+    var reverseN = reverseDigit(n)
+    var string = ""
+    var current = digitNumber(n)
+    while (current > 0) {
+        val counter = reverseN % 10
+        string += when (current) {
+            4 -> thousands[counter]
+            3 -> hundreeds[counter]
+            2 -> tens[counter]
+            1 -> units[counter]
+            else -> break
+        }
+        current--
+        reverseN /= 10
+    }
+    return string
+}
 
 /**
  * Очень сложная (7 баллов)
@@ -250,4 +316,104 @@ fun roman(n: Int): String = TODO()
  * Например, 375 = "триста семьдесят пять",
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
-fun russian(n: Int): String = TODO()
+
+fun russian(n: Int): String {
+    val units = listOf(
+        "", "один", "два", "три", "четыре",
+        "пять", "шесть", "семь", "восемь", "девять"
+    )
+    val tens = listOf(
+        "", "десять", "двадцать", "тридцать", "сорок", "пятьдесят",
+        "шестьдесят", "семьдесят", "восемьдесят", "девяносто"
+    )
+    val hundreds = listOf(
+        "", "сто", "двести", "триста", "четыреста",
+        "пятьсот", "шестьсот", "семьсот", "восемьсот", "девятьсот"
+    )
+    val error = listOf(
+        "", "одиннадцать", "двенадцать", "тринадцать", "четырнадцать", "пятнадцать",
+        "шестнадцать", "семнадцать", "восемнадцать", "девятнадцать"
+    )
+    val list = mutableListOf<String>()
+    var current = digitNumber(n)
+    var indexInList = 0
+    var reverseN = reverseDigit(n)
+    while (current > 0) {
+        val currentNum = reverseN % 10
+        when (current) {
+            1, 4 -> when {
+                currentNum == 2 && current == 4 -> when {
+                    digitNumber(n) >= 5 -> {
+                        if (list[indexInList - 1] == "десять") {
+                            list[indexInList - 1] = error[currentNum]
+                            indexInList--
+                        } else list += "две"
+                    }
+                    else -> list += "две"
+                }
+
+                currentNum == 1 && current == 4 -> when {
+                    digitNumber(n) >= 5 -> if (list[indexInList - 1] == "десять") {
+                        list[indexInList - 1] = error[currentNum]
+                        indexInList--
+                    } else list += "одна"
+                    else -> list += "одна"
+                }
+
+                currentNum == 0 -> if (indexInList >= 1) indexInList--
+
+                digitNumber(n) == 1 -> list += units[currentNum]
+
+                digitNumber(n) == 4 && current == 4 -> list += units[currentNum]
+
+                list[indexInList - 1] == "десять" -> {
+                    list[indexInList - 1] = error[currentNum]
+                    indexInList--
+                }
+
+                else -> list += units[currentNum]
+            }
+
+            2, 5 -> when (currentNum) {
+                0 -> if (indexInList >= 1) indexInList--
+                else -> list += tens[currentNum]
+
+            }
+            3, 6 -> when (currentNum) {
+                0 -> if (indexInList >= 1) indexInList--
+                else -> list += hundreds[currentNum]
+
+            }
+        }
+        if (current == 4) {
+            list += when {
+                list[indexInList] == error[currentNum] -> {
+                    "тысяч"
+                }
+                else -> when (currentNum) {
+                    1 -> "тысяча"
+                    2, 3, 4 -> "тысячи"
+                    5, 6, 7, 8, 9, 0 -> "тысяч"
+                    else -> break
+                }
+            }
+            indexInList++
+        }
+        current--
+        indexInList++
+        reverseN /= 10
+    }
+    return list.joinToString(separator = " ")
+}
+
+fun reverseDigit(n: Int): Int {
+    var result = 0
+    var nIn = n
+    while (nIn > 0) {
+        result = result * 10 + nIn % 10
+        nIn /= 10
+    }
+    return result
+}
+
+
