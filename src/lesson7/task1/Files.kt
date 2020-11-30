@@ -341,7 +341,8 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     var counterB = 0
     var counterBI = 0
     for (line in File(inputName).readLines()) {
-        if (line.isEmpty()) {
+        println(line.replace(" ", "").isEmpty())
+        if (line.replace(" ", "").isEmpty()) {
             safeP++
             continue
         }
@@ -353,7 +354,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
         loop@ for ((index, char) in line.withIndex()) {
             if (char == '*' || char == '*' && index == line.length - 1) {
                 counter++
-                if (index != line.length-1) continue@loop
+                if (index != line.length - 1) continue@loop
             }
             if ((counter != 0 && char != '*') || index == line.length - 1 && char == '*') {
                 when (counter) {
