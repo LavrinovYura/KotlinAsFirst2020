@@ -350,11 +350,12 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
             writer.write("<p>")
             safeP = 0
         }
-        loop@ for (char in line) {
-            if (char == '*') {
+        loop@ for ((index, char) in line.withIndex()) {
+            if (char == '*' || char == '*' && index == line.length - 1) {
                 counter++
-                continue@loop
-            } else if (counter != 0 && char != '*') {
+                if (index != line.length-1) continue@loop
+            }
+            if ((counter != 0 && char != '*') || index == line.length - 1 && char == '*') {
                 when (counter) {
                     1 -> {
                         if (counterI == 1 && (counterBI == 2 || counterBI == 1)) {
@@ -440,7 +441,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                 }
                 continue@loop
             }
-            writer.write("$char")
+            if (!(index == line.length - 1 && char == '*')) writer.write("$char")
         }
     }
     writer.write("</p>")
@@ -448,7 +449,6 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     writer.write("</html>")
     writer.close()
 }
-
 
 /**
  * Сложная (23 балла)
