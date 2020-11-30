@@ -341,7 +341,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     var counterB = 0
     var counterBI = 0
     for (line in File(inputName).readLines()) {
-        println(line.replace(" ", "").isEmpty())
+
         if (line.replace(" ", "").isEmpty()) {
             safeP++
             continue
