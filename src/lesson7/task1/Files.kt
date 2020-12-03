@@ -63,14 +63,14 @@ fun alignFile(inputName: String, lineLength: Int, outputName: String) {
  * Подчёркивание в середине и/или в конце строк значения не имеет.
  */
 fun deleteMarked(inputName: String, outputName: String) {
-    val writer = File(outputName).bufferedWriter()
-    for (line in File(inputName).readLines()) {
-        if (!line.matches(Regex("""^_[\s\S]*$"""))) {
-            writer.write(line)
-            writer.newLine()
+    File(outputName).bufferedWriter().use {
+        for (line in File(inputName).readLines()) {
+            if (!line.matches(Regex("""^_.*$"""))) {
+                it.write(line)
+                it.newLine()
+            }
         }
     }
-    writer.close()
 }
 
 
@@ -89,20 +89,23 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
     for (word in subs) result[word] = 0
 
     for (line in File(inputName).readLines()) {
-        for (word in subs)
-            if (line.toLowerCase().contains(word.toLowerCase())) {
-                for (i in line.indices) {
+        val currentLine = line.toLowerCase()
+        for (element in subs) {
+            val word = element.toLowerCase()
+            if (currentLine.contains(word)) {
+                for (i in currentLine.indices) {
                     var counter = 0
                     var char = i
                     while (counter < word.length && char < line.length) {
-                        if (line[char].toLowerCase() == word[counter].toLowerCase()) {
+                        if (currentLine[char] == word[counter]) {
                             counter++
                             char++
                         } else break
                     }
-                    if (counter == word.length) result[word] = result[word]!! + 1
+                    if (counter == word.length) result[element] = result[element]!! + 1
                 }
             }
+        }
     }
     return result
 }
@@ -122,21 +125,16 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
  *
  */
 fun sibilants(inputName: String, outputName: String) {
+    val mistakes =
+        mapOf('ы' to 'и', 'я' to 'а', 'ю' to 'у', 'Ы' to 'И', 'Я' to 'А', 'Ю' to 'У')
     val writer = File(outputName).bufferedWriter()
+    val error = "(?<=[чЧщЩжЖшШ])"
     for (line in File(inputName).readLines()) {
         var safe = line
-        if (safe.contains(Regex("""(?<=[чЧщЩжЖшШ])ы""")))
-            safe = Regex("""(?<=[чЧщЩжЖшШ])ы""").replace(safe, "и")
-        if (safe.contains(Regex("""(?<=[чЧщЩжЖшШ])Ы""")))
-            safe = Regex("""(?<=[чЧщЩжЖшШ])Ы""").replace(safe, "И")
-        if (safe.contains(Regex("""(?<=[чЧщЩжЖшШ])я""")))
-            safe = Regex("""(?<=[чЧщЩжЖшШ])я""").replace(safe, "а")
-        if (safe.contains(Regex("""(?<=[чЧщЩжЖшШ])Я""")))
-            safe = Regex("""(?<=[чЧщЩжЖшШ])Я""").replace(safe, "А")
-        if (safe.contains(Regex("""(?<=[чЧщЩжЖшШ])ю""")))
-            safe = Regex("""(?<=[чЧщЩжЖшШ])ю""").replace(safe, "у")
-        if (safe.contains(Regex("""(?<=[чЧщЩжЖшШ])Ю""")))
-            safe = Regex("""(?<=[чЧщЩжЖшШ])Ю""").replace(safe, "У")
+        for ((key, value) in mistakes) {
+            if (safe.contains(Regex("""($error)$key""")))
+                safe = Regex("""($error)$key""").replace(safe, "$value")
+        }
         writer.write(safe)
         writer.newLine()
     }
@@ -322,7 +320,7 @@ Lorem ipsum <i>dolor sit amet</i>, consectetur <b>adipiscing</b> elit.
 Vestibulum lobortis. <s>Est vehicula rutrum <i>suscipit</i></s>, ipsum <s>lib</s>ero <i>placerat <b>tortor</b></i>.
 </p>
 <p>
-Suspendisse <s>et elit in enim tempus iaculis</s>.
+Suspendisse <s>et elit in enim tempus iaculis\n</s>.
 </p>
 </body>
 </html>
@@ -330,127 +328,133 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
-    val writer = File(outputName).bufferedWriter()
-    writer.write("<html>")
-    writer.write("<body>")
-    writer.write("<p>")
-    var safeStr = false
-    var counterS = 0
-    var safeP = 0
-    var counter = 0
-    var counterI = 0
-    var counterB = 0
-    var counterBI = 0
-    for (line in File(inputName).readLines()) {
-        if (line.replace(Regex("""\s*|\t*"""), "").isEmpty() && safeStr) {
-            safeP++
-            continue
-        }
-
-        if (safeP != 0 && safeStr) {
-            writer.write("</p>")
-            writer.write("<p>")
-            safeP = 0
-        }
-        loop@ for ((index, char) in line.withIndex()) {
-            safeStr = true
-            if (char == '*' || char == '*' && index == line.length - 1) {
-                counter++
-                if (index != line.length - 1) continue@loop
+    File(outputName).bufferedWriter().use {
+        it.write("<html>")
+        it.write("<body>")
+        it.write("<p>")
+        var safeStr = false
+        var counterS = 0
+        var safeP = 0
+        var counterStar = 0
+        var counterI = 0
+        var counterB = 0
+        var counterBI = 0
+        for (line in File(inputName).readLines()) {
+            if (line.matches(Regex("""\s*""")) && safeStr) {
+                safeP++
+                continue
             }
-            if ((counter != 0 && char != '*') || index == line.length - 1 && char == '*') {
-                when (counter) {
-                    1 -> {
-                        if (counterI == 1 && (counterBI == 2 || counterBI == 1)) {
-                            writer.write("</i>")
-                            counterI--
-                            counterBI--
-                            counter = 0
-                        } else if (counterI == 1) {
-                            writer.write("</i>")
-                            counterI--
-                            counter = 0
-                        } else {
-                            writer.write("<i>")
-                            counterI++
-                            counter = 0
+
+            if (safeP != 0 && safeStr) {
+                it.write("</p>")
+                it.write("<p>")
+                safeP = 0
+            }
+            loop@ for ((index, char) in line.withIndex()) {
+                safeStr = true
+                if (counterS == 1 && char != '~') it.write("~")
+
+                if (char == '*') {
+                    counterStar++
+                    if (index != line.length - 1) continue@loop
+                }
+
+                if ((counterStar != 0 && char != '*') || index == line.length - 1 && char == '*') {
+                    when (counterStar) {
+                        1 -> {
+                            if (counterI == 1 && (counterBI == 2 || counterBI == 1)) {
+                                it.write("</i>")
+                                counterI--
+                                counterBI--
+                                counterStar = 0
+                            } else if (counterI == 1) {
+                                it.write("</i>")
+                                counterI--
+                                counterStar = 0
+                            } else {
+                                it.write("<i>")
+                                counterI++
+                                counterStar = 0
+                            }
                         }
-                    }
-                    2 -> {
-                        if (counterB == 1 && (counterBI == 2 || counterBI == 1)) {
-                            writer.write("</b>")
-                            counterB--
-                            counterBI--
-                            counter = 0
-                        } else if (counterB == 1) {
-                            writer.write("</b>")
-                            counterB--
-                            counter = 0
-                        } else {
-                            writer.write("<b>")
-                            counterB++
-                            counter = 0
+                        2 -> {
+                            if (counterB == 1 && (counterBI == 2 || counterBI == 1)) {
+                                it.write("</b>")
+                                counterB--
+                                counterBI--
+                                counterStar = 0
+                            } else if (counterB == 1) {
+                                it.write("</b>")
+                                counterB--
+                                counterStar = 0
+                            } else {
+                                it.write("<b>")
+                                counterB++
+                                counterStar = 0
+                            }
                         }
-                    }
-                    3 -> {
-                        when {
-                            counterBI == 0 && counterI == 1 && counterB == 1 -> {
-                                writer.write("</b></i>")
-                                counterBI = 0
-                                counterI = 0
-                                counterB = 0
-                                counter = 0
-                            }
-                            counterBI == 0 && counterI == 1 -> {
-                                writer.write("<b></i>")
-                                counterBI = 1
-                                counterI = 0
-                                counter = 0
-                            }
-                            counterBI == 0 && counterB == 1 -> {
-                                writer.write("</b><i>")
-                                counterBI = 1
-                                counterI = 0
-                                counter = 0
-                            }
-                            counterBI == 2 -> {
-                                writer.write("</b></i>")
-                                counterBI = 0
-                                counter = 0
-                            }
-                            counterBI == 0 && counterI == 0 && counterB == 0 -> {
-                                writer.write("<b><i>")
-                                counterBI = 2
-                                counterI = 1
-                                counterB = 1
-                                counter = 0
+                        3 -> {
+                            when {
+                                counterBI == 0 && counterI == 1 && counterB == 1 -> {
+                                    it.write("</b></i>")
+                                    counterBI = 0
+                                    counterI = 0
+                                    counterB = 0
+                                    counterStar = 0
+                                }
+                                counterBI == 0 && counterI == 1 -> {
+                                    it.write("<b></i>")
+                                    counterBI = 1
+                                    counterI = 0
+                                    counterStar = 0
+                                }
+                                counterBI == 0 && counterB == 1 -> {
+                                    it.write("</b><i>")
+                                    counterBI = 1
+                                    counterI = 0
+                                    counterStar = 0
+                                }
+                                counterBI == 2 -> {
+                                    it.write("</b></i>")
+                                    counterBI = 0
+                                    counterStar = 0
+                                }
+                                counterBI == 0 && counterI == 0 && counterB == 0 -> {
+                                    it.write("<b><i>")
+                                    counterBI = 2
+                                    counterI = 1
+                                    counterB = 1
+                                    counterStar = 0
+                                }
+
                             }
 
                         }
-
                     }
                 }
-            }
-            if (char == '~') {
-                counterS++
-                if (counterS == 2) {
-                    writer.write("<s>")
+                if (char == '~') {
+                    counterS++
+                    when (counterS) {
+                        2 -> {
+                            it.write("<s>")
+                            continue@loop
+                        }
+                        4 -> {
+                            it.write("</s>")
+                            counterS = 0
+                            continue@loop
+                        }
+                    }
                     continue@loop
                 }
-                if (counterS == 4) {
-                    writer.write("</s>")
-                    counterS = 0
-                    continue@loop
-                }
-                continue@loop
+                if (!(index == line.length - 1 && char == '*')) it.write("$char")
             }
-            if (!(index == line.length - 1 && char == '*')) writer.write("$char")
         }
+        it.write("</p>")
+        it.write("</body>")
+        it.write("</html>")
+        it.close()
     }
-    writer.write("</p>")
-    writer.write("</body>")
-    writer.write("</html>")
-    writer.close()
 }
 
 /**
