@@ -66,14 +66,17 @@ fun alignFile(inputName: String, lineLength: Int, outputName: String) {
  * Подчёркивание в середине и/или в конце строк значения не имеет.
  */
 fun deleteMarked(inputName: String, outputName: String) {
-    val writer = File(outputName).bufferedWriter()
-    for (line in File(inputName).readLines()) {
-        if (!line.matches(Regex("""^_[\s\S]*$"""))) {
-            writer.write(line)
-            writer.newLine()
+    File(outputName).bufferedWriter().use {
+        for (line in File(inputName).readLines()) {
+            if (!line.matches(Regex("""^_[\s\S]*$"""))) {
+                it.write(line)
+                it.newLine()
+            }
         }
     }
 }
+
+
 
 
 /**
@@ -637,21 +640,11 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     var digit = lhv / 10.0.pow(digitNumber(lhv) - dividersStr[0].length).toInt()
     println(digit)
     var digitRe = reverseDigit(lhv % 10.0.pow(digitNumber(lhv) - dividersStr[0].length).toInt())
-    if (rhv != 1) {
-        for (number in dividersStr) {
-            if (digitRe != 0) mods.add("${(digit - number.toInt())}${digitRe % 10}")
-            else mods.add("${(digit - number.toInt())}")
-            digit = "${(digit - number.toInt())}${digitRe % 10}".toInt()
-            digitRe /= 10
-        }
-    } else {
-        var revDigit = reverseDigit(lhv)
-        for ((ind, value) in lhvList.withIndex()) {
-            revDigit /= 10
-            if (revDigit != 0) mods.add("${value.toInt() - dividersStr[ind].toInt()}${revDigit % 10}")
-            else mods.add("${value.toInt() - dividersStr[ind].toInt()}")
-
-        }
+    for ((i, number) in dividersStr.withIndex()) {
+        if (i != dividersStr.size - 1) mods.add("${(digit - number.toInt())}${digitRe % 10}")
+        else mods.add("${(digit - number.toInt())}")
+        digit = "${(digit - number.toInt())}${digitRe % 10}".toInt()
+        digitRe /= 10
     }
     result.toString()
     File(outputName).bufferedWriter().use {
