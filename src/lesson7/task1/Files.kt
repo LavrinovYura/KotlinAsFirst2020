@@ -3,7 +3,6 @@
 package lesson7.task1
 
 import lesson3.task1.digitNumber
-import lesson4.task1.reverseDigit
 import java.io.File
 import kotlin.math.pow
 
@@ -635,13 +634,17 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         result /= 10
     }
     dividersStr.reverse()
-    var digit = lhv / 10.0.pow(digitNumber(lhv) - dividersStr[0].length).toInt()
+    var digit: Int
+    if (dividersStr.size != 1) {
+        digit = lhv / 10.0.pow(digitNumber(lhv) - dividersStr[0].length).toInt()
+    } else digit = lhv
     val reList = mutableListOf<String>()
     var safed = lhv
     for (i in 0 until (digitNumber(lhv) - dividersStr[0].length)) {
         reList.add("${safed % 10}")
         safed /= 10
     }
+    println(digit)
     reList.reverse()
     for ((i, number) in dividersStr.withIndex()) {
         if (i != dividersStr.size - 1) mods.add("${(digit - number.toInt())}${reList[i]}")
@@ -653,11 +656,16 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     }
     result.toString()
     File(outputName).bufferedWriter().use {
-        it.write(" $lhv | $rhv")
-        var safe = " $lhv | $rhv".length - rhv.toString().length
+        var safe: Int
+        if ("-${dividersStr[0]}".length != "$lhv".length) {
+            it.write(" $lhv | $rhv")
+            safe = " $lhv | $rhv".length - "$rhv".length
+        } else {
+            it.write("$lhv | $rhv")
+            safe = "$lhv | $rhv".length - "$rhv".length
+        }
         it.newLine()
-        it.write("-${dividersStr[0]}")
-        it.write("${" ".repeat(safe - dividersStr[0].length - 1)}${lhv / rhv}")
+        it.write("-${dividersStr[0]}${" ".repeat(safe - dividersStr[0].length - 1)}${lhv / rhv}")
         safe = "-${dividersStr[0]}".length
         it.newLine()
         it.write("-".repeat(safe))
