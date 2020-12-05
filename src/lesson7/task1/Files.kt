@@ -77,8 +77,6 @@ fun deleteMarked(inputName: String, outputName: String) {
 }
 
 
-
-
 /**
  * Средняя (14 баллов)
  *
@@ -640,11 +638,20 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     var digit = lhv / 10.0.pow(digitNumber(lhv) - dividersStr[0].length).toInt()
     println(digit)
     var digitRe = reverseDigit(lhv % 10.0.pow(digitNumber(lhv) - dividersStr[0].length).toInt())
-    for ((i, number) in dividersStr.withIndex()) {
-        if (i != dividersStr.size - 1) mods.add("${(digit - number.toInt())}${digitRe % 10}")
-        else mods.add("${(digit - number.toInt())}")
-        digit = "${(digit - number.toInt())}${digitRe % 10}".toInt()
-        digitRe /= 10
+    if (rhv != 1) {
+        for ((i, number) in dividersStr.withIndex()) {
+            if (i != dividersStr.size - 1) mods.add("${(digit - number.toInt())}${digitRe % 10}")
+            else mods.add("${(digit - number.toInt())}")
+            digit = "${(digit - number.toInt())}${digitRe % 10}".toInt()
+            digitRe /= 10
+        }
+    } else {
+        var revDigit = reverseDigit(lhv)
+        for ((ind, value) in lhvList.withIndex()) {
+            revDigit /= 10
+            if (revDigit != 0) mods.add("${value.toInt() - dividersStr[ind].toInt()}${revDigit % 10}")
+            else mods.add("${value.toInt() - dividersStr[ind].toInt()}")
+        }
     }
     result.toString()
     File(outputName).bufferedWriter().use {
