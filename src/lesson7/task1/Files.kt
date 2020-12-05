@@ -66,12 +66,11 @@ fun alignFile(inputName: String, lineLength: Int, outputName: String) {
  * Подчёркивание в середине и/или в конце строк значения не имеет.
  */
 fun deleteMarked(inputName: String, outputName: String) {
-    File(outputName).bufferedWriter().use {
-        for (line in File(inputName).readLines()) {
-            if (!line.matches(Regex("""^_.*$"""))) {
-                it.write(line)
-                it.newLine()
-            }
+    val writer = File(outputName).bufferedWriter()
+    for (line in File(inputName).readLines()) {
+        if (!line.matches(Regex("""^_[\s\S]*$"""))) {
+            writer.write(line)
+            writer.newLine()
         }
     }
 }
@@ -635,8 +634,9 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         result /= 10
     }
     dividersStr.reverse()
-    var digit = lhv / 10.0.pow(dividersStr[0].length - 1).toInt()
-    var digitRe = reverseDigit(lhv % 10.0.pow(dividersStr[0].length - 1).toInt())
+    var digit = lhv / 10.0.pow(digitNumber(lhv) - dividersStr[0].length).toInt()
+    println(digit)
+    var digitRe = reverseDigit(lhv % 10.0.pow(digitNumber(lhv) - dividersStr[0].length).toInt())
     if (rhv != 1) {
         for (number in dividersStr) {
             if (digitRe != 0) mods.add("${(digit - number.toInt())}${digitRe % 10}")
@@ -683,5 +683,4 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         }
     }
 }
-
 
