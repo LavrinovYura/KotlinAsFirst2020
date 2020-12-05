@@ -2,7 +2,10 @@
 
 package lesson7.task1
 
+import lesson3.task1.digitNumber
+import lesson4.task1.reverseDigit
 import java.io.File
+import kotlin.math.pow
 
 // Урок 7: работа с файлами
 // Урок интегральный, поэтому его задачи имеют сильно увеличенную стоимость
@@ -621,6 +624,64 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  *
  */
 fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
-    TODO()
+    val dividersStr = mutableListOf<String>()
+    val mods = mutableListOf<String>()
+    val lhvList = mutableListOf<String>()
+    val lhvStr = lhv.toString()
+    for (i in lhvStr.indices) lhvList.add(lhvStr[i].toString())
+    var result = lhv / rhv
+    for (i in 0 until digitNumber(result)) {
+        dividersStr.add(((result % 10) * rhv).toString())
+        result /= 10
+    }
+    dividersStr.reverse()
+    var digit = lhv / 10.0.pow(dividersStr[0].length - 1).toInt()
+    var digitRe = reverseDigit(lhv % 10.0.pow(dividersStr[0].length - 1).toInt())
+    if (rhv != 1) {
+        for (number in dividersStr) {
+            if (digitRe != 0) mods.add("${(digit - number.toInt())}${digitRe % 10}")
+            else mods.add("${(digit - number.toInt())}")
+            digit = "${(digit - number.toInt())}${digitRe % 10}".toInt()
+            digitRe /= 10
+        }
+    } else {
+        var revDigit = reverseDigit(lhv)
+        for ((ind, value) in lhvList.withIndex()) {
+            revDigit /= 10
+            if (revDigit != 0) mods.add("${value.toInt() - dividersStr[ind].toInt()}${revDigit % 10}")
+            else mods.add("${value.toInt() - dividersStr[ind].toInt()}")
+
+        }
+    }
+    result.toString()
+    File(outputName).bufferedWriter().use {
+        it.write(" $lhv | $rhv")
+        var safe = " $lhv | $rhv".length - rhv.toString().length
+        it.newLine()
+        it.write("-${dividersStr[0]}")
+        it.write("${" ".repeat(safe - dividersStr[0].length - 1)}${lhv / rhv}")
+        safe = "-${dividersStr[0]}".length
+        it.newLine()
+        it.write("-".repeat(safe))
+        safe = "-".repeat(safe).length
+        it.newLine()
+        for ((index, mod) in mods.withIndex()) {
+            if (index == dividersStr.size - 1) {
+                it.write("${" ".repeat(safe - mod.length)}$mod")
+                break
+            }
+            it.write("${" ".repeat(safe - mod.length + 1)}$mod")
+            safe = "${" ".repeat(safe - mod.length + 1)}$mod".length
+            it.newLine()
+            it.write("${" ".repeat(safe - "-${dividersStr[index + 1]}".length)}-${dividersStr[index + 1]}")
+            it.newLine()
+            it.write("${" ".repeat(safe - "-${dividersStr[index + 1]}".length)}${"-".repeat("-${dividersStr[index + 1]}".length)}")
+            safe =
+                ("${" ".repeat(safe - "-${dividersStr[index + 1]}".length)}${"-".repeat("-${dividersStr[index + 1]}".length)}").length
+            it.newLine()
+
+        }
+    }
 }
+
 
