@@ -636,22 +636,20 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     }
     dividersStr.reverse()
     var digit = lhv / 10.0.pow(digitNumber(lhv) - dividersStr[0].length).toInt()
-    println(digit)
-    var digitRe = reverseDigit(lhv % 10.0.pow(digitNumber(lhv) - dividersStr[0].length).toInt())
-    if (rhv != 1) {
-        for ((i, number) in dividersStr.withIndex()) {
-            if (i != dividersStr.size - 1) mods.add("${(digit - number.toInt())}${digitRe % 10}")
-            else mods.add("${(digit - number.toInt())}")
-            digit = "${(digit - number.toInt())}${digitRe % 10}".toInt()
-            digitRe /= 10
+    val reList = mutableListOf<String>()
+    var safed = lhv
+    for (i in 0 until (digitNumber(lhv) - dividersStr[0].length)) {
+        reList.add("${safed % 10}")
+        safed /= 10
+    }
+    reList.reverse()
+    for ((i, number) in dividersStr.withIndex()) {
+        if (i != dividersStr.size - 1) mods.add("${(digit - number.toInt())}${reList[i]}")
+        else {
+            mods.add("${(digit - number.toInt())}")
+            break
         }
-    } else {
-        var revDigit = reverseDigit(lhv)
-        for ((ind, value) in lhvList.withIndex()) {
-            revDigit /= 10
-            if (revDigit != 0) mods.add("${value.toInt() - dividersStr[ind].toInt()}${revDigit % 10}")
-            else mods.add("${value.toInt() - dividersStr[ind].toInt()}")
-        }
+        digit = "${(digit - number.toInt())}${reList[i]}".toInt()
     }
     result.toString()
     File(outputName).bufferedWriter().use {
