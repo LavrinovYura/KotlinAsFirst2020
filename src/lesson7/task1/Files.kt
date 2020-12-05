@@ -655,9 +655,10 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         digit = "${(digit - number.toInt())}${reList[i]}".toInt()
     }
     result.toString()
+    digit = lhv / 10.0.pow(digitNumber(lhv) - dividersStr[0].length).toInt()
     File(outputName).bufferedWriter().use {
         var safe: Int
-        if ("-${dividersStr[0]}".length != "$lhv".length) {
+        if ("-${dividersStr[0]}".length != "$digit".length) {
             it.write(" $lhv | $rhv")
             safe = " $lhv | $rhv".length - "$rhv".length
         } else {
