@@ -686,10 +686,17 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             it.newLine()
             it.write("${" ".repeat(safe - "-${dividersStr[index + 1]}".length)}-${dividersStr[index + 1]}")
             it.newLine()
-            it.write("${" ".repeat(safe - "-${dividersStr[index + 1]}".length)}${"-".repeat("-${dividersStr[index + 1]}".length)}")
-            safe =
-                ("${" ".repeat(safe - "-${dividersStr[index + 1]}".length)}${"-".repeat("-${dividersStr[index + 1]}".length)}").length
+            if (mod.length < "-${dividersStr[index + 1]}".length) {
+                it.write("${" ".repeat(safe - "-${dividersStr[index + 1]}".length)}${"-".repeat("-${dividersStr[index + 1]}".length)}")
+                safe =
+                    "${" ".repeat(safe - "-${dividersStr[index + 1]}".length)}${"-".repeat("-${dividersStr[index + 1]}".length)}".length
+            } else {
+                it.write("${" ".repeat(safe - mod.length)}${"-".repeat(mod.length)}")
+                safe = "${" ".repeat(safe - mod.length)}${"-".repeat(mod.length)}".length
+            }
+
             it.newLine()
+
 
         }
     }
