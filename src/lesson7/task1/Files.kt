@@ -644,7 +644,6 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         reList.add("${safed % 10}")
         safed /= 10
     }
-    println(digit)
     reList.reverse()
     for ((i, number) in dividersStr.withIndex()) {
         if (i != dividersStr.size - 1) mods.add("${(digit - number.toInt())}${reList[i]}")
@@ -655,20 +654,25 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         digit = "${(digit - number.toInt())}${reList[i]}".toInt()
     }
     result.toString()
-    digit = lhv / 10.0.pow(digitNumber(lhv) - dividersStr[0].length).toInt()
+    digit = if (dividersStr[0].toInt() != 0) lhv / 10.0.pow(digitNumber(lhv) - dividersStr[0].length).toInt()
+    else lhv
+    println(digit)
     File(outputName).bufferedWriter().use {
         var safe: Int
-        if ("-${dividersStr[0]}".length != "$digit".length) {
+        if ("$digit".length < "-${dividersStr[0]}".length) {
             it.write(" $lhv | $rhv")
             safe = " $lhv | $rhv".length - "$rhv".length
+            it.newLine()
+            it.write("-${dividersStr[0]}${" ".repeat(safe - dividersStr[0].length - 1)}${lhv / rhv}")
+            safe = "-${dividersStr[0]}".length
+            it.newLine()
         } else {
             it.write("$lhv | $rhv")
-            safe = "$lhv | $rhv".length - "$rhv".length
+            safe = "$digit".length
+            it.newLine()
+            it.write("${" ".repeat(safe - 2)}-${dividersStr[0]}${" ".repeat(3)}${lhv / rhv}")
+            it.newLine()
         }
-        it.newLine()
-        it.write("-${dividersStr[0]}${" ".repeat(safe - dividersStr[0].length - 1)}${lhv / rhv}")
-        safe = "-${dividersStr[0]}".length
-        it.newLine()
         it.write("-".repeat(safe))
         safe = "-".repeat(safe).length
         it.newLine()
