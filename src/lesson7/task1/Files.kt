@@ -342,7 +342,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
         var counterB = 0
         var counterBI = 0
         for (line in File(inputName).readLines()) {
-            if (line.matches(Regex("""\s*""")) && safeStr) {
+            if (line.matches(Regex("""\s*""")) && !safeStr) {
                 safeP++
                 continue
             }
@@ -354,7 +354,10 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
             }
             loop@ for ((index, char) in line.withIndex()) {
                 safeStr = true
-                if (counterS == 1 && char != '~') it.write("~")
+                if (counterS == 1 && char != '~') {
+                    it.write("~")
+                    counterS = 0
+                }
 
                 if (char == '*') {
                     counterStar++
