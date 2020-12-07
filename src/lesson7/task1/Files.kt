@@ -4,6 +4,7 @@ package lesson7.task1
 
 import lesson3.task1.digitNumber
 import java.io.File
+import kotlin.math.max
 import kotlin.math.pow
 
 // Урок 7: работа с файлами
@@ -67,7 +68,7 @@ fun alignFile(inputName: String, lineLength: Int, outputName: String) {
 fun deleteMarked(inputName: String, outputName: String) {
     File(outputName).bufferedWriter().use {
         for (line in File(inputName).readLines()) {
-            if (!line.matches(Regex("""^_[\s\S]*$"""))) {
+            if (!line.matches(Regex("""^_.*$"""))) {
                 it.write(line)
                 it.newLine()
             }
@@ -129,18 +130,19 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
 fun sibilants(inputName: String, outputName: String) {
     val mistakes =
         mapOf('ы' to 'и', 'я' to 'а', 'ю' to 'у', 'Ы' to 'И', 'Я' to 'А', 'Ю' to 'У')
-    val writer = File(outputName).bufferedWriter()
-    val error = "(?<=[чЧщЩжЖшШ])"
-    for (line in File(inputName).readLines()) {
-        var safe = line
-        for ((key, value) in mistakes) {
-            if (safe.contains(Regex("""($error)$key""")))
-                safe = Regex("""($error)$key""").replace(safe, "$value")
+    File(outputName).bufferedWriter().use {
+        val error = "(?<=[чЧщЩжЖшШ])"
+        for (line in File(inputName).readLines()) {
+            var safe = line
+            for ((key, value) in mistakes) {
+                if (safe.contains(Regex("""($error)$key""")))
+                    safe = Regex("""($error)$key""").replace(safe, "$value")
+            }
+            it.write(safe)
+            it.newLine()
         }
-        writer.write(safe)
-        writer.newLine()
+        it.close()
     }
-    writer.close()
 }
 
 /**
@@ -354,77 +356,77 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
             }
             loop@ for ((index, char) in line.withIndex()) {
                 safeStr = true
-                if (counterS == 1 && char != '~') {
+                if (counterS == 1 && char != '~') {                   //проверка на блуждающую ~
                     it.write("~")
                     counterS = 0
                 }
 
-                if (char == '*') {
+                if (char == '*') {                //пока не пройдут * то не входит и выйти
                     counterStar++
                     if (index != line.length - 1) continue@loop
                 }
 
                 if ((counterStar != 0 && char != '*') || index == line.length - 1 && char == '*') {
                     when (counterStar) {
-                        1 -> {
-                            if (counterI == 1 && (counterBI == 2 || counterBI == 1)) {
+                        1 -> {                                                            //если попалась 1*
+                            if (counterI == 1 && (counterBI == 2 || counterBI == 1)) {    //если была открыта от 3*
                                 it.write("</i>")
                                 counterI--
                                 counterBI--
                                 counterStar = 0
-                            } else if (counterI == 1) {
+                            } else if (counterI == 1) {                                   //если была открыта 1*
                                 it.write("</i>")
                                 counterI--
                                 counterStar = 0
-                            } else {
+                            } else {                                                      //иначе открываем
                                 it.write("<i>")
                                 counterI++
                                 counterStar = 0
                             }
                         }
-                        2 -> {
-                            if (counterB == 1 && (counterBI == 2 || counterBI == 1)) {
+                        2 -> {                                                            //если 2*
+                            if (counterB == 1 && (counterBI == 2 || counterBI == 1)) {    //если была открыта от 3*
                                 it.write("</b>")
                                 counterB--
                                 counterBI--
                                 counterStar = 0
-                            } else if (counterB == 1) {
+                            } else if (counterB == 1) {                                    //если открыта от 2**
                                 it.write("</b>")
                                 counterB--
                                 counterStar = 0
-                            } else {
+                            } else {                                                       //иначе открываем
                                 it.write("<b>")
                                 counterB++
                                 counterStar = 0
                             }
                         }
-                        3 -> {
+                        3 -> {                                                              //если 3*
                             when {
-                                counterBI == 0 && counterI == 1 && counterB == 1 -> {
-                                    it.write("</b></i>")
+                                counterBI == 0 && counterI == 1 && counterB == 1 -> {     //если были открытые bi
+                                    it.write("</b></i>")                              //то закрываем их
                                     counterBI = 0
                                     counterI = 0
                                     counterB = 0
                                     counterStar = 0
                                 }
-                                counterBI == 0 && counterI == 1 -> {
+                                counterBI == 0 && counterI == 1 -> {                      //была открыта только i
                                     it.write("<b></i>")
                                     counterBI = 1
                                     counterI = 0
                                     counterStar = 0
                                 }
-                                counterBI == 0 && counterB == 1 -> {
+                                counterBI == 0 && counterB == 1 -> {                      //была открыта только b
                                     it.write("</b><i>")
                                     counterBI = 1
                                     counterI = 0
                                     counterStar = 0
                                 }
-                                counterBI == 2 -> {
+                                counterBI == 2 -> {                                       //до этого мы встречали ***
                                     it.write("</b></i>")
                                     counterBI = 0
                                     counterStar = 0
                                 }
-                                counterBI == 0 && counterI == 0 && counterB == 0 -> {
+                                counterBI == 0 && counterI == 0 && counterB == 0 -> {    //иначе откроем и i и b
                                     it.write("<b><i>")
                                     counterBI = 2
                                     counterI = 1
@@ -625,22 +627,23 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  *
  */
+
 fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     val dividersStr = mutableListOf<String>()
     val mods = mutableListOf<String>()
     val lhvList = mutableListOf<String>()
     val lhvStr = lhv.toString()
-    for (i in lhvStr.indices) lhvList.add(lhvStr[i].toString())
+    for (i in lhvStr) lhvList.add(i.toString())
     var result = lhv / rhv
     for (i in 0 until digitNumber(result)) {
         dividersStr.add(((result % 10) * rhv).toString())
         result /= 10
     }
     dividersStr.reverse()
-    var digit: Int
-    if (dividersStr.size != 1) {
-        digit = lhv / 10.0.pow(digitNumber(lhv) - dividersStr[0].length).toInt()
-    } else digit = lhv
+    val subtrahend: Int
+    subtrahend = if (dividersStr.size != 1) {
+        lhv / 10.0.pow(digitNumber(lhv) - dividersStr[0].length).toInt()
+    } else lhv
     val reList = mutableListOf<String>()
     var safed = lhv
     for (i in 0 until (digitNumber(lhv) - dividersStr[0].length)) {
@@ -648,59 +651,51 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         safed /= 10
     }
     reList.reverse()
+    var subtrahendIn = subtrahend
     for ((i, number) in dividersStr.withIndex()) {
-        if (i != dividersStr.size - 1) mods.add("${(digit - number.toInt())}${reList[i]}")
+        val dif = "${(subtrahendIn - number.toInt())}"
+        if (i != dividersStr.size - 1) mods.add("$dif${reList[i]}")
         else {
-            mods.add("${(digit - number.toInt())}")
+            mods.add(dif)
             break
         }
-        digit = "${(digit - number.toInt())}${reList[i]}".toInt()
+        subtrahendIn = "$dif${reList[i]}".toInt()
     }
-    result.toString()
-    digit = if (dividersStr[0].toInt() != 0) lhv / 10.0.pow(digitNumber(lhv) - dividersStr[0].length).toInt()
-    else lhv
-    println(digit)
     File(outputName).bufferedWriter().use {
         var safe: Int
-        if ("$digit".length < "-${dividersStr[0]}".length) {
+        val divFr = "-${dividersStr[0]}"
+        if ("$subtrahend".length < divFr.length) {
             it.write(" $lhv | $rhv")
-            safe = " $lhv | $rhv".length - "$rhv".length
+            safe = " $lhv | ".length
             it.newLine()
-            it.write("-${dividersStr[0]}${" ".repeat(safe - dividersStr[0].length - 1)}${lhv / rhv}")
-            safe = "-${dividersStr[0]}".length
+            it.write("-${dividersStr[0]}${" ".repeat(safe - divFr.length)}${lhv / rhv}")
+            safe = divFr.length
             it.newLine()
         } else {
             it.write("$lhv | $rhv")
-            safe = "$digit".length
+            safe = "$subtrahend".length - divFr.length
             it.newLine()
-            it.write("${" ".repeat(safe - 2)}-${dividersStr[0]}${" ".repeat(3)}${lhv / rhv}")
+            it.write("${" ".repeat(safe)}$divFr${" ".repeat(3)}${lhv / rhv}")
+            safe = "$subtrahend".length
             it.newLine()
         }
         it.write("-".repeat(safe))
-        safe = "-".repeat(safe).length
         it.newLine()
         for ((index, mod) in mods.withIndex()) {
             if (index == dividersStr.size - 1) {
                 it.write("${" ".repeat(safe - mod.length)}$mod")
                 break
             }
-            it.write("${" ".repeat(safe - mod.length + 1)}$mod")
-            safe = "${" ".repeat(safe - mod.length + 1)}$mod".length
+            val modLn = "${" ".repeat(safe - mod.length + 1)}$mod"
+            it.write(modLn)
+            safe = modLn.length
             it.newLine()
             it.write("${" ".repeat(safe - "-${dividersStr[index + 1]}".length)}-${dividersStr[index + 1]}")
             it.newLine()
-            if (mod.length < "-${dividersStr[index + 1]}".length) {
-                it.write("${" ".repeat(safe - "-${dividersStr[index + 1]}".length)}${"-".repeat("-${dividersStr[index + 1]}".length)}")
-                safe =
-                    "${" ".repeat(safe - "-${dividersStr[index + 1]}".length)}${"-".repeat("-${dividersStr[index + 1]}".length)}".length
-            } else {
-                it.write("${" ".repeat(safe - mod.length)}${"-".repeat(mod.length)}")
-                safe = "${" ".repeat(safe - mod.length)}${"-".repeat(mod.length)}".length
-            }
-
+            val maxModDiv = max(mod.length, "-${dividersStr[index + 1]}".length)
+            it.write("${" ".repeat(safe - maxModDiv)}${"-".repeat(maxModDiv)}")
+            safe = "${" ".repeat(safe - maxModDiv)}${"-".repeat(maxModDiv)}".length
             it.newLine()
-
-
         }
     }
 }
