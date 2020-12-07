@@ -342,7 +342,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
         var counterB = 0
         var counterBI = 0
         for (line in File(inputName).readLines()) {
-            if (line.matches(Regex("""\s*""")) && !safeStr) {
+            if (line.matches(Regex("""\s*""")) && safeStr) {
                 safeP++
                 continue
             }
