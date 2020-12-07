@@ -354,10 +354,9 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
             }
             loop@ for ((index, char) in line.withIndex()) {
                 safeStr = true
-                if (counterS == 1 && char != '~') {
-                    it.write("~")
-                    counterS = 0
-                }
+
+                if (counterS == 1 && char != '~') it.write("~")
+
 
                 if (char == '*') {
                     counterStar++
@@ -704,4 +703,5 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         }
     }
 }
+
 
