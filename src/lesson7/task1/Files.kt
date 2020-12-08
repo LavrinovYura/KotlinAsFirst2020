@@ -3,7 +3,9 @@
 package lesson7.task1
 
 import lesson3.task1.digitNumber
+import ru.spbstu.kotlin.typeclass.classes.Monoid.Companion.plus
 import java.io.File
+import java.lang.StringBuilder
 import kotlin.math.max
 import kotlin.math.pow
 
@@ -96,17 +98,15 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
         for (element in subs) {
             val word = element.toLowerCase()
             if (currentLine.contains(word)) {
-                for (i in currentLine.indices) {
-                    var counter = 0
-                    var char = i
-                    while (counter < word.length && char < line.length) {
-                        if (currentLine[char] == word[counter]) {
-                            counter++
-                            char++
-                        } else break
+                var counter = 0
+                do {
+                    counter = currentLine.indexOf(word, counter)
+                    if (counter != -1) {
+                        result[element] = result[element]!! + 1
+                        counter++
                     }
-                    if (counter == word.length) result[element] = result[element]!! + 1
-                }
+                } while (counter != -1)
+
             }
         }
     }
@@ -309,7 +309,10 @@ fun chooseLongestChaoticWord(inputName: String, outputName: String) {
  * и никак иначе.
  *
  * При решении этой и двух следующих задач полезно прочитать статью Википедии "Стек".
- *
+ *   * ** ***
+ *   *** ** *
+ *   * * ** ** *** ***
+ *   (*** **) (*  (**  **) *)
  * Пример входного файла:
 Lorem ipsum *dolor sit amet*, consectetur **adipiscing** elit.
 Vestibulum lobortis, ~~Est vehicula rutrum *suscipit*~~, ipsum ~~lib~~ero *placerat **tortor***,
@@ -333,133 +336,63 @@ Suspendisse <s>et elit in enim tempus iaculis\n</s>.
  */
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
     File(outputName).bufferedWriter().use {
-        it.write("<html>")
-        it.write("<body>")
-        it.write("<p>")
+        val stars = listOf("", "<i>", "<b>", "<b><i>")
+        val starsClose = listOf("", "</i>", "</b>", "</b></i>", "</i></b>")
+        val wave = listOf("<s>", "</s>")
+        it.write("<html><body><p>")
         var safeStr = false
-        var counterS = 0
-        var safeP = 0
+        var counterS = 2
         var counterStar = 0
-        var counterI = 0
-        var counterB = 0
-        var counterBI = 0
+        var counterLast = 0
+        var sumStar = 0
+        var safeP = 0
         for (line in File(inputName).readLines()) {
-            if (line.matches(Regex("""\s*""")) && safeStr) {
+            var lineChek = "$line "
+            if (lineChek.matches(Regex("""\s*""")) && safeStr) {
                 safeP++
                 continue
             }
-
             if (safeP != 0 && safeStr) {
-                it.write("</p>")
-                it.write("<p>")
+                it.write("</p><p>")
                 safeP = 0
             }
-            loop@ for ((index, char) in line.withIndex()) {
+            while (lineChek.contains("~~")) {
+                lineChek = lineChek.replaceFirst("~~", wave[counterS % 2])
+                counterS++
+            }
+            for (char in lineChek) {
                 safeStr = true
-                if (counterS == 1 && char != '~') {                   //проверка на блуждающую ~
-                    it.write("~")
-                    counterS = 0
-                }
-
-                if (char == '*') {                //пока не пройдут * то не входит и выйти
+                if (char == '*') {
                     counterStar++
-                    if (index != line.length - 1) continue@loop
+                    if (counterStar < 3) continue
                 }
-
-                if ((counterStar != 0 && char != '*') || index == line.length - 1 && char == '*') {
-                    when (counterStar) {
-                        1 -> {                                                            //если попалась 1*
-                            if (counterI == 1 && (counterBI == 2 || counterBI == 1)) {    //если была открыта от 3*
-                                it.write("</i>")
-                                counterI--
-                                counterBI--
-                                counterStar = 0
-                            } else if (counterI == 1) {                                   //если была открыта 1*
-                                it.write("</i>")
-                                counterI--
-                                counterStar = 0
-                            } else {                                                      //иначе открываем
-                                it.write("<i>")
-                                counterI++
-                                counterStar = 0
-                            }
-                        }
-                        2 -> {                                                            //если 2*
-                            if (counterB == 1 && (counterBI == 2 || counterBI == 1)) {    //если была открыта от 3*
-                                it.write("</b>")
-                                counterB--
-                                counterBI--
-                                counterStar = 0
-                            } else if (counterB == 1) {                                    //если открыта от 2**
-                                it.write("</b>")
-                                counterB--
-                                counterStar = 0
-                            } else {                                                       //иначе открываем
-                                it.write("<b>")
-                                counterB++
-                                counterStar = 0
-                            }
-                        }
-                        3 -> {                                                              //если 3*
-                            when {
-                                counterBI == 0 && counterI == 1 && counterB == 1 -> {     //если были открытые bi
-                                    it.write("</b></i>")                              //то закрываем их
-                                    counterBI = 0
-                                    counterI = 0
-                                    counterB = 0
-                                    counterStar = 0
-                                }
-                                counterBI == 0 && counterI == 1 -> {                      //была открыта только i
-                                    it.write("<b></i>")
-                                    counterBI = 1
-                                    counterI = 0
-                                    counterStar = 0
-                                }
-                                counterBI == 0 && counterB == 1 -> {                      //была открыта только b
-                                    it.write("</b><i>")
-                                    counterBI = 1
-                                    counterI = 0
-                                    counterStar = 0
-                                }
-                                counterBI == 2 -> {                                       //до этого мы встречали ***
-                                    it.write("</b></i>")
-                                    counterBI = 0
-                                    counterStar = 0
-                                }
-                                counterBI == 0 && counterI == 0 && counterB == 0 -> {    //иначе откроем и i и b
-                                    it.write("<b><i>")
-                                    counterBI = 2
-                                    counterI = 1
-                                    counterB = 1
-                                    counterStar = 0
-                                }
-
-                            }
-
-                        }
+                if (counterStar in 1..3) {
+                    if (counterLast == 0) {
+                        it.write("${stars[counterStar]}$char")
+                        counterLast = counterStar
+                        counterStar = 0
+                        sumStar++
+                        continue
                     }
-                }
-                if (char == '~') {
-                    counterS++
-                    when (counterS) {
-                        2 -> {
-                            it.write("<s>")
-                            continue@loop
-                        }
-                        4 -> {
-                            it.write("</s>")
-                            counterS = 0
-                            continue@loop
-                        }
+                    if (counterLast != counterStar && sumStar != 2) {
+                        it.write(stars[counterStar])
+                        counterLast = counterStar
+                        sumStar++
+                    } else {
+                        if (sumStar == 2) {
+                            if (counterLast == 2) it.write(starsClose[3]) else it.write(starsClose[4])
+                        } else it.write(starsClose[counterStar])
+                        sumStar = 0
+                        counterLast = 0
                     }
-                    continue@loop
+                    if (char != '*') it.write("$char")
+                    counterStar = 0
+                    continue
                 }
-                if (!(index == line.length - 1 && char == '*')) it.write("$char")
+                it.write("$char")
             }
         }
-        it.write("</p>")
-        it.write("</body>")
-        it.write("</html>")
+        it.write("</p></body></html>")
         it.close()
     }
 }
@@ -627,13 +560,10 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  *
  */
-
+// в процессе исправления
 fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     val dividersStr = mutableListOf<String>()
     val mods = mutableListOf<String>()
-    val lhvList = mutableListOf<String>()
-    val lhvStr = lhv.toString()
-    for (i in lhvStr) lhvList.add(i.toString())
     var result = lhv / rhv
     for (i in 0 until digitNumber(result)) {
         dividersStr.add(((result % 10) * rhv).toString())
