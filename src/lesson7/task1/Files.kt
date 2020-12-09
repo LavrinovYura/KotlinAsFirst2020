@@ -361,46 +361,44 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                 val idI = lineChek.indexOf('*', idStar)
                 val idB = lineChek.indexOf("**", idStar)
                 val idIB = lineChek.indexOf("***", idStar)
-                if (idI != -1 || idB != -1 || idIB != -1) {
-                    if (idI != -1 && idI != idB) {
-                        if (iOp) {
-                            lineChek = lineChek.replaceFirst("*", "<i>")
-                            iOp = false
-                        } else {
-                            lineChek = lineChek.replaceFirst("*", "</i>")
-                            iOp = true
-                        }
-                        idStar = idI
-                        continue
-                    }
-                    if (idI != -1 && (idB != idIB)) {
-                        if (bOp) {
-                            lineChek = lineChek.replaceFirst("**", "<b>")
-                            bOp = false
-                        } else {
-                            lineChek = lineChek.replaceFirst("**", "</b>")
-                            bOp = true
-                        }
-                        idStar = idB
-                        continue
-                    }
-
-                    if (bOp && iOp || ibOp) {
-                        lineChek = lineChek.replaceFirst("***", "</b></i>")
+                if (idI != -1 && idI != idB) {
+                    if (iOp) {
+                        lineChek = lineChek.replaceFirst("*", "<i>")
                         iOp = false
-                        bOp = false
-                        ibOp = false
-
                     } else {
-                        lineChek = lineChek.replaceFirst("***", "<b><i>")
+                        lineChek = lineChek.replaceFirst("*", "</i>")
                         iOp = true
-                        bOp = true
-                        ibOp = true
                     }
-                    idStar = idIB
+                    idStar = idI
                     continue
-
                 }
+                if (idI != -1 && (idB != idIB)) {
+                    if (bOp) {
+                        lineChek = lineChek.replaceFirst("**", "<b>")
+                        bOp = false
+                    } else {
+                        lineChek = lineChek.replaceFirst("**", "</b>")
+                        bOp = true
+                    }
+                    idStar = idB
+                    continue
+                }
+
+                if (bOp && iOp || ibOp) {
+                    lineChek = lineChek.replaceFirst("***", "</b></i>")
+                    iOp = false
+                    bOp = false
+                    ibOp = false
+
+                } else {
+                    lineChek = lineChek.replaceFirst("***", "<b><i>")
+                    iOp = true
+                    bOp = true
+                    ibOp = true
+                }
+                idStar = idIB
+                continue
+
             }
             println(lineChek)
             it.write(lineChek)
