@@ -3,9 +3,7 @@
 package lesson7.task1
 
 import lesson3.task1.digitNumber
-import ru.spbstu.kotlin.typeclass.classes.Monoid.Companion.plus
 import java.io.File
-import java.lang.StringBuilder
 import kotlin.math.max
 import kotlin.math.pow
 
@@ -336,61 +334,76 @@ Suspendisse <s>et elit in enim tempus iaculis\n</s>.
  */
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
     File(outputName).bufferedWriter().use {
-        val stars = listOf("", "<i>", "<b>", "<b><i>")
-        val starsClose = listOf("", "</i>", "</b>", "</b></i>", "</i></b>")
         val wave = listOf("<s>", "</s>")
         it.write("<html><body><p>")
         var safeStr = false
         var counterS = 2
-        var counterStar = 0
-        var counterLast = 0
-        var sumStar = 0
         var safeP = 0
+        var iOp = true
+        var bOp = true
+        var ibOp = true
         for (line in File(inputName).readLines()) {
-            var lineChek = "$line "
-            if (lineChek.matches(Regex("""\s*""")) && safeStr) {
+            var lineChek = " $line "
+            if (lineChek.matches(Regex("""\s*"""))) {
                 safeP++
                 continue
             }
-            if (safeP != 0 && safeStr) {
-                it.write("</p><p>")
-                safeP = 0
-            }
+            if (safeP != 0 && safeStr) it.write("</p><p>")
+
+            safeStr = true
+            safeP = 0
             while (lineChek.contains("~~")) {
                 lineChek = lineChek.replaceFirst("~~", wave[counterS % 2])
                 counterS++
             }
-            for (char in lineChek) {
-                safeStr = true
-                if (char == '*') {
-                    counterStar++
-                    if (counterStar < 3) continue
-                }
-                if (counterStar in 1..3) {
-                    if (counterLast == 0) {
-                        it.write("${stars[counterStar]}$char")
-                        counterLast = counterStar
-                        counterStar = 0
-                        sumStar++
+            var idStar = 0
+            while (lineChek.contains('*')) {
+                val idI = lineChek.indexOf('*', idStar)
+                val idB = lineChek.indexOf("**", idStar)
+                val idIB = lineChek.indexOf("***", idStar)
+                if (idI != -1 || idB != -1 || idIB != -1) {
+                    if (idI != -1 && idI != idB) {
+                        if (iOp) {
+                            lineChek = lineChek.replaceFirst("*", "<i>")
+                            iOp = false
+                        } else {
+                            lineChek = lineChek.replaceFirst("*", "</i>")
+                            iOp = true
+                        }
+                        idStar = idI
                         continue
                     }
-                    if (counterLast != counterStar && sumStar != 2) {
-                        it.write(stars[counterStar])
-                        counterLast = counterStar
-                        sumStar++
-                    } else {
-                        if (sumStar == 2) {
-                            if (counterLast == 2) it.write(starsClose[3]) else it.write(starsClose[4])
-                        } else it.write(starsClose[counterStar])
-                        sumStar = 0
-                        counterLast = 0
+                    if (idI != -1 && (idB != idIB)) {
+                        if (bOp) {
+                            lineChek = lineChek.replaceFirst("**", "<b>")
+                            bOp = false
+                        } else {
+                            lineChek = lineChek.replaceFirst("**", "</b>")
+                            bOp = true
+                        }
+                        idStar = idB
+                        continue
                     }
-                    if (char != '*') it.write("$char")
-                    counterStar = 0
+
+                    if (bOp && iOp || ibOp) {
+                        lineChek = lineChek.replaceFirst("***", "</b></i>")
+                        iOp = false
+                        bOp = false
+                        ibOp = false
+
+                    } else {
+                        lineChek = lineChek.replaceFirst("***", "<b><i>")
+                        iOp = true
+                        bOp = true
+                        ibOp = true
+                    }
+                    idStar = idIB
                     continue
+
                 }
-                it.write("$char")
             }
+            println(lineChek)
+            it.write(lineChek)
         }
         it.write("</p></body></html>")
         it.close()
