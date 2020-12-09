@@ -571,7 +571,6 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  *
  */
-// в процессе исправления
 fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     val dividersStr = mutableListOf<String>()
     val mods = mutableListOf<String>()
@@ -607,16 +606,14 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         val divFr = "-${dividersStr[0]}"
         if ("$subtrahend".length < divFr.length) {
             it.write(" $lhv | $rhv")
-            safe = " $lhv | ".length
             it.newLine()
-            it.write("-${dividersStr[0]}${" ".repeat(safe - divFr.length)}${lhv / rhv}")
+            it.write("${divFr.padEnd("$lhv".length + 4)}${lhv / rhv}")
             safe = divFr.length
             it.newLine()
         } else {
             it.write("$lhv | $rhv")
-            safe = "$subtrahend".length - divFr.length
             it.newLine()
-            it.write("${" ".repeat(safe)}$divFr${" ".repeat(3)}${lhv / rhv}")
+            it.write("${divFr.padStart("$subtrahend".length)}${" ".repeat(3)}${lhv / rhv}")
             safe = "$subtrahend".length
             it.newLine()
         }
@@ -627,15 +624,16 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
                 it.write("${" ".repeat(safe - mod.length)}$mod")
                 break
             }
-            val modLn = "${" ".repeat(safe - mod.length + 1)}$mod"
+            val modLn = mod.padStart(safe + 1)
+            val curDiv = "-${dividersStr[index + 1]}"
             it.write(modLn)
             safe = modLn.length
             it.newLine()
-            it.write("${" ".repeat(safe - "-${dividersStr[index + 1]}".length)}-${dividersStr[index + 1]}")
+            it.write(curDiv.padStart(safe))
             it.newLine()
-            val maxModDiv = max(mod.length, "-${dividersStr[index + 1]}".length)
-            it.write("${" ".repeat(safe - maxModDiv)}${"-".repeat(maxModDiv)}")
-            safe = "${" ".repeat(safe - maxModDiv)}${"-".repeat(maxModDiv)}".length
+            val maxModDiv = max(mod.length, curDiv.length)
+            it.write("".padStart(maxModDiv, '-').padStart(safe))
+            safe = ("".padStart(maxModDiv, '-').padStart(safe)).length
             it.newLine()
         }
     }
