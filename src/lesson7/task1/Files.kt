@@ -621,7 +621,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         it.newLine()
         for ((index, mod) in mods.withIndex()) {
             if (index == dividersStr.size - 1) {
-                it.write("${" ".repeat(safe - mod.length)}$mod")
+                it.write(mod.padStart(safe))
                 break
             }
             val modLn = mod.padStart(safe + 1)
@@ -633,7 +633,6 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             it.newLine()
             val maxModDiv = max(mod.length, curDiv.length)
             it.write("".padStart(maxModDiv, '-').padStart(safe))
-            safe = ("".padStart(maxModDiv, '-').padStart(safe)).length
             it.newLine()
         }
     }
