@@ -83,8 +83,8 @@ Basic, Ruby, Swift.
             countSubstrings("input/substrings_in1.txt", listOf("Карминовый", "Некрасивый", "белоглазый"))
         )
         assertEquals(
-            mapOf("--" to 4, "ее" to 2, "животное" to 2, "." to 2),
-            countSubstrings("input/substrings_in2.txt", listOf("--", "ее", "животное", "."))
+            mapOf("вб" to 2),
+            countSubstrings("input/substrings_in2.txt", listOf("вб", "вб"))
         )
     }
 
@@ -406,13 +406,16 @@ Basic, Ruby, Swift.
         )
 
         test(
-            2,
-            20,
+            871449,
+            76143,
             """
-              2 | 20
-             -0   0
-             --
-              2
+              871449 | 76143
+             -76143    11
+             ------
+              110019
+              -76143
+              ------
+               33876
              """
         )
 
@@ -439,6 +442,23 @@ Basic, Ruby, Swift.
              """
         )
 
+        test(
+            52397,
+            73898,
+            """
+                   52397 | 73898
+                      -0   0
+                   -----
+                   52397
+"""
+        )
+
         File("temp.txt").delete()
+    }
+
+
+    @Test
+    fun crossZeroCoordinate() {
+        assertEquals(Pair(15, 7), crossZeroCoordinate("input/crossZero", '0'))
     }
 }

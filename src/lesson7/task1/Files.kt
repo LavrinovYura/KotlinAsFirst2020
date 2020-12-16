@@ -4,6 +4,7 @@ package lesson7.task1
 
 import lesson3.task1.digitNumber
 import java.io.File
+import java.lang.IllegalArgumentException
 import kotlin.math.max
 import kotlin.math.pow
 
@@ -343,7 +344,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
         var bOp = true
         var ibOp = true
         for (line in File(inputName).readLines()) {
-            var lineChek = " $line "
+            var lineChek = line
             if (lineChek.matches(Regex("""\s*"""))) {
                 safeP++
                 continue
@@ -473,8 +474,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
 <li>Соус</li>
 </ul>
 </li>
-<li>
-Салат Оливье
+<li>Салат Оливье
 <ol>
 <li>Мясо
 <ul>
@@ -638,4 +638,81 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     }
 }
 
+fun crossZeroCoordinate(inputName: String, motion: Char): Pair<Int, Int>? {
+    val table = Array(15) { Array(15) { ' ' } }
+    val verticalMap = mutableMapOf<Int, Int>()
+    for (i in 0..14) verticalMap += i to 0
+    var count = 0
+    for ((ind, line) in File(inputName).readLines().withIndex()) {
+        if (!line.matches(Regex("""[-x0]{15}"""))) throw IllegalArgumentException()
+        for (element in line.toList()) {
+            table[ind][count] = element
+            count++
+        }
+        count = 0
+    }
 
+    for (i in 0..14) {
+        for ((key, element) in verticalMap) {
+            if (table[i][key] == motion) {
+                var diagonalCount = 1
+                if (i + 3 <= 14 && (key - 3 >= 0 || key - 4 >= 0)) {             //условие для диагонали уходящей в лево
+                    count = i + 1
+                    for (j in key - 1 downTo key - 3) {
+                        if (table[count][j] == motion) {
+                            count++
+                            diagonalCount++
+                        } else break
+                    }
+                    if (diagonalCount == 4) {
+                        if (key != 14 && i - 1 >= 0) if (table[i - 1][key + 1] == '-')
+                            return Pair(i - 1 + 1, key + 1 + 1)
+
+                        if (key - 4 >= 0 && i + 4 <= 14) if (table[i + 4][key - 4] == '-')
+                            return Pair(i + 4 + 1, key - 4 + 1)
+
+                    }
+                }
+                if (i + 3 <= 14 && (key + 3 <= 14 || key + 4 <= 14)) {          //условие для диагонали уходящей в право
+                    count = i + 1
+                    diagonalCount = 1
+                    for (k in key + 1..key + 3) {
+                        if (table[count][k] == motion) {
+                            count++
+                            diagonalCount++
+                        } else break
+                    }
+                    if (diagonalCount == 4) {
+                        if (i - 1 >= 0 && key != 0) if (table[i - 1][key - 1] == '-')
+                            return Pair(i - 1 + 1, key - 1 + 1)
+
+                        if (key + 4 <= 14 && i + 4 <= 14) if (table[i + 4][key + 4] == '-')
+                            return Pair(i + 4 + 1, key + 4 + 1)
+
+                    }
+                }
+            }
+            var horizontalCount = 0
+            if (table[i][key] == motion) {
+                horizontalCount++
+                if (element != 0) verticalMap[key] = verticalMap[key]!! + 1
+                else verticalMap[key] = 1
+            } else {
+                verticalMap[key] = 0
+                horizontalCount = 0
+            }
+            if (horizontalCount == 4) {
+                if (key != 3) if (table[i][key - 4] == '-') return Pair(i + 1, key - 4 + 1)
+                else if (key != 14) if (table[i][key + 1] == '-') return Pair(i + 1, key + 1 + 1)
+            }
+            if (verticalMap[key] == 4) {
+                if (i != 3) if (table[i - 4][key] == '-') return Pair(i - 4 + 1, key + 1)
+                else if (i != 14) if (table[i + 1][key] == '-') return Pair(i + 1 + 1, key + 1)
+            }
+
+        }
+    }
+
+    println(verticalMap)
+    return null
+}
