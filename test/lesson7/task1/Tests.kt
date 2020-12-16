@@ -460,5 +460,6 @@ Basic, Ruby, Swift.
     @Test
     fun crossZeroCoordinate() {
         assertEquals(Pair(15, 7), crossZeroCoordinate("input/crossZero", '0'))
+        assertEquals(null, crossZeroCoordinate("input/crossZero1", '0'))
     }
 }

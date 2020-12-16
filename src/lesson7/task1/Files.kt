@@ -666,9 +666,8 @@ fun crossZeroCoordinate(inputName: String, motion: Char): Pair<Int, Int>? {
                     }
                     if (diagonalCount == 4) {
                         if (key != 14 && i - 1 >= 0) if (table[i - 1][key + 1] == '-')
-                            return Pair(i - 1 + 1, key + 1 + 1)
-
-                        if (key - 4 >= 0 && i + 4 <= 14) if (table[i + 4][key - 4] == '-')
+                            return Pair(i - 1 + 1, key + 1 + 1)                    //у каждой координаты в return +1 что
+                        if (key - 4 >= 0 && i + 4 <= 14) if (table[i + 4][key - 4] == '-')// бы перейти в координаты 1-15
                             return Pair(i + 4 + 1, key - 4 + 1)
 
                     }
@@ -712,7 +711,5 @@ fun crossZeroCoordinate(inputName: String, motion: Char): Pair<Int, Int>? {
 
         }
     }
-
-    println(verticalMap)
     return null
 }
