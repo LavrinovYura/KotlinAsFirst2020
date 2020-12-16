@@ -1,8 +1,10 @@
 package lesson7.task1
 
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
+
 import java.io.File
 
 class Tests {
@@ -459,7 +461,15 @@ Basic, Ruby, Swift.
 
     @Test
     fun crossZeroCoordinate() {
-        assertEquals(Pair(15, 7), crossZeroCoordinate("input/crossZero", '0'))
-        assertEquals(null, crossZeroCoordinate("input/crossZero1", '0'))
+        assertEquals(Pair(10, 5), crossZeroCoordinate("input/crossZero", 'x'))
+        assertEquals(Pair(10, 6), crossZeroCoordinate("input/crossZero1", 'x'))
+        assertEquals(Pair(13, 9), crossZeroCoordinate("input/crossZero2", 'x'))
+        assertEquals(Pair(11, 12), crossZeroCoordinate("input/crossZero3", 'x'))
+        assertEquals(Pair(13, 7), crossZeroCoordinate("input/crossZero4", 'x'))
+        assertEquals(Pair(13, 2), crossZeroCoordinate("input/crossZero5", 'x'))
+        assertEquals(Pair(12, 2), crossZeroCoordinate("input/crossZero6", 'x'))
+        assertThrows(IllegalArgumentException::class.java) { crossZeroCoordinate("input/crossZero7", 'x') }
+        assertEquals(null, crossZeroCoordinate("input/crossZeroNull", 'x'))
+
     }
 }
