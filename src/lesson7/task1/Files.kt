@@ -656,7 +656,7 @@ fun crossZeroCoordinate(inputName: String, motion: Char): Pair<Int, Int>? {
             var safe = true
             countLine = line + 1
             if (table[line][element] == motion && line <= 10) {
-                for (j in element - 1 downTo 0) { //цикл для диагонали уходящей на лево
+                for (j in element - 1 downTo 0) {                  //цикл для диагонали уходящей на лево
                     if (table[countLine][j] == motion || safe) {
                         if (table[countLine][j] == '-') {
                             safe = false
@@ -678,7 +678,7 @@ fun crossZeroCoordinate(inputName: String, motion: Char): Pair<Int, Int>? {
                 diagonalCount = 1
                 safe = true
                 safeDiagonal = Pair(0, 0)
-                for (k in element + 1..14) {   //цикл для диагонали уходящей на право
+                for (k in element + 1..14) {                   //цикл для диагонали уходящей на право
                     if (table[countLine][k] == motion || safe) {
                         if (table[countLine][k] == '-') {
                             safe = false
@@ -701,7 +701,7 @@ fun crossZeroCoordinate(inputName: String, motion: Char): Pair<Int, Int>? {
             safe = true
             var horizontalCount = 1
             if (table[line][element] == motion) {
-                for (symbol in element + 1..14) {            //цикл для диагонали
+                for (symbol in element + 1..14) {               //цикл для диагонали
                     if (table[line][symbol] == motion || safe) {
                         if (table[line][symbol] == '-') {
                             safeHorizontal = Pair(line + 1, symbol + 1)
@@ -720,7 +720,7 @@ fun crossZeroCoordinate(inputName: String, motion: Char): Pair<Int, Int>? {
             safe = true
             var verticalCount = 1
             if (table[line][element] == motion) {
-                for (column in line + 1..14) {                //цикл для вертикали
+                for (column in line + 1..14) {                     //цикл для вертикали
                     if (table[column][element] == motion || safe) {
                         if (table[column][element] == '-') {
                             safeVertical = Pair(column + 1, element + 1)
