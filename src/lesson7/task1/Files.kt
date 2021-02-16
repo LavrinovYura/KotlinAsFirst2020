@@ -4,7 +4,6 @@ package lesson7.task1
 
 import lesson3.task1.digitNumber
 import java.io.File
-import java.lang.IllegalArgumentException
 import kotlin.math.max
 import kotlin.math.pow
 
@@ -87,31 +86,7 @@ fun deleteMarked(inputName: String, outputName: String) {
  * Регистр букв игнорировать, то есть буквы е и Е считать одинаковыми.
  *
  */
-fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
-    val result = mutableMapOf<String, Int>()
-    val subs = substrings.toSet()
-    for (word in subs) result[word] = 0
-
-    for (line in File(inputName).readLines()) {
-        val currentLine = line.toLowerCase()
-        for (element in subs) {
-            val word = element.toLowerCase()
-            if (currentLine.contains(word)) {
-                var counter = 0
-                do {
-                    counter = currentLine.indexOf(word, counter)
-                    if (counter != -1) {
-                        result[element] = result[element]!! + 1
-                        counter++
-                    }
-                } while (counter != -1)
-
-            }
-        }
-    }
-    return result
-}
-
+fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> = TODO()
 
 
 /**
@@ -639,103 +614,3 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     }
 }
 
-fun crossZeroCoordinate(inputName: String, motion: Char): Pair<Int, Int>? {
-    val table = Array(15) { Array(15) { ' ' } }
-    var countLine = 0
-    for ((ind, line) in File(inputName).readLines().withIndex()) {
-        if (!line.matches(Regex("""[0x-]{15}"""))) throw IllegalArgumentException()
-        for (element in line.toList()) {
-            table[ind][countLine] = element
-            countLine++
-        }
-        countLine = 0
-    }
-    for (line in 0..14) {
-        for (element in 0..14) {
-            var safeDiagonal = Pair(0, 0)
-            var diagonalCount = 1
-            var safe = true
-            countLine = line + 1
-            if (table[line][element] == motion && line <= 10) {
-                for (j in element - 1 downTo 0) { //цикл для диагонали уходящей на лево
-                    if (table[countLine][j] == motion || safe) {
-                        if (table[countLine][j] == '-') {
-                            safe = false
-                            safeDiagonal = Pair(countLine + 1, j + 1)
-                        } else if (table[countLine][j] == motion) diagonalCount++ else break
-                    } else break
-                    countLine++
-                }
-                if (diagonalCount == 4 && safe) {
-                    //у каждой координаты в return +1 что бы перейти в координаты 1-15
-                    if (element != 14 && line - 1 >= 0) if (table[line - 1][element + 1] == '-')
-                        return Pair(line, element + 2)
-                    if (element - 4 >= 0 && line + 4 <= 14) if (table[line + 4][element - 4] == '-')
-                        return Pair(line + 5, element - 3)
-                    break
-                } else if (diagonalCount == 4 && !safe) return safeDiagonal
-
-                countLine = line + 1
-                diagonalCount = 1
-                safe = true
-                safeDiagonal = Pair(0, 0)
-                for (k in element + 1..14) {   //цикл для диагонали уходящей на право
-                    if (table[countLine][k] == motion || safe) {
-                        if (table[countLine][k] == '-') {
-                            safe = false
-                            safeDiagonal = Pair(countLine + 1, k + 1)
-                        } else if (table[countLine][k] == motion) diagonalCount++ else break
-                    } else break
-                    countLine++
-                }
-                if (diagonalCount == 4 && safe) {
-                    //у каждой координаты в return +1 что бы перейти в координаты 1-15
-                    if (line - 1 >= 0 && element != 0) if (table[line - 1][element - 1] == '-')
-                        return Pair(line, element)
-                    if (element + 4 <= 14 && line + 4 <= 14) if (table[line + 4][element + 4] == '-')
-                        return Pair(line + 5, element + 5)
-                    break
-                } else if (diagonalCount == 4 && !safe) return safeDiagonal
-
-            }
-            var safeHorizontal = Pair(0, 0)
-            safe = true
-            var horizontalCount = 1
-            if (table[line][element] == motion) {
-                for (symbol in element + 1..14) {            //цикл для диагонали
-                    if (table[line][symbol] == motion || safe) {
-                        if (table[line][symbol] == '-') {
-                            safeHorizontal = Pair(line + 1, symbol + 1)
-                            safe = false
-                        } else if (table[line][symbol] == motion) horizontalCount++ else break
-                    } else break
-                    if (horizontalCount == 4 && safe) {
-                        //у каждой координаты в return +1 что бы перейти в координаты 1-15
-                        if (element - 1 >= 0) if (table[line][element - 1] == '-') return Pair(line + 1, element)
-                        if (element + 4 <= 14) if (table[line][element + 4] == '-') return Pair(line + 1, element + 5)
-                        break
-                    } else if (horizontalCount == 4 && !safe) return safeHorizontal
-                }
-            }
-            var safeVertical = Pair(0, 0)
-            safe = true
-            var verticalCount = 1
-            if (table[line][element] == motion) {
-                for (column in line + 1..14) {                //цикл для вертикали
-                    if (table[column][element] == motion || safe) {
-                        if (table[column][element] == '-') {
-                            safeVertical = Pair(column + 1, element + 1)
-                            safe = false
-                        } else if (table[column][element] == motion) verticalCount++ else break
-                    } else break
-                    if (verticalCount == 4 && safe) {
-                        //у каждой координаты в return +1 что бы перейти в координаты 1-15
-                        if (line - 1 >= 0) if (table[line - 1][element] == '-') return Pair(line, element + 1)
-                        if (line + 4 <= 14) if (table[line + 4][element] == '-') return Pair(line + 5, element + 1)
-                    } else if (verticalCount == 4 && !safe) return safeVertical
-                }
-            }
-        }
-    }
-    return null
-}
