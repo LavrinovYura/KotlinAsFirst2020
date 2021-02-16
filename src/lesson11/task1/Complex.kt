@@ -69,4 +69,10 @@ class Complex(val re: Double, val im: Double) {
      * Преобразование в строку
      */
     override fun toString(): String = if (im < 0) "$re${im}i" else "$re+${im}i"
+
+    override fun hashCode(): Int {
+        var result = re.hashCode()
+        result = 31 * result + im.hashCode()
+        return result
+    }
 }
