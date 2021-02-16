@@ -457,19 +457,4 @@ Basic, Ruby, Swift.
 
         File("temp.txt").delete()
     }
-
-
-    @Test
-    fun crossZeroCoordinate() {
-        assertEquals(Pair(10, 5), crossZeroCoordinate("input/crossZero", 'x'))
-        assertEquals(Pair(10, 6), crossZeroCoordinate("input/crossZero1", 'x'))
-        assertEquals(Pair(13, 9), crossZeroCoordinate("input/crossZero2", 'x'))
-        assertEquals(Pair(11, 12), crossZeroCoordinate("input/crossZero3", 'x'))
-        assertEquals(Pair(13, 7), crossZeroCoordinate("input/crossZero4", 'x'))
-        assertEquals(Pair(13, 2), crossZeroCoordinate("input/crossZero5", 'x'))
-        assertEquals(Pair(12, 2), crossZeroCoordinate("input/crossZero6", 'x'))
-        assertThrows(IllegalArgumentException::class.java) { crossZeroCoordinate("input/crossZero7", 'x') }
-        assertEquals(null, crossZeroCoordinate("input/crossZeroNull", 'x'))
-
-    }
 }
