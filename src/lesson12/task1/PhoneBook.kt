@@ -17,8 +17,9 @@ package lesson12.task1
  *
  * Класс должен иметь конструктор по умолчанию (без параметров).
  */
+@Suppress("TYPE_INFERENCE_ONLY_INPUT_TYPES_WARNING")
 class PhoneBook() {
-    private var map = mutableMapOf<String, MutableSet<String>>()
+    private val map = mutableMapOf<String, MutableSet<String>>()
 
     /**
      * Добавить человека.
@@ -27,7 +28,7 @@ class PhoneBook() {
      * (во втором случае телефонная книга не должна меняться).
      */
     fun addHuman(name: String): Boolean =
-        if (!map.containsKey(name)) {
+        if (name !in map) {
             map[name] = mutableSetOf()
             true
         } else false
@@ -54,7 +55,7 @@ class PhoneBook() {
      * либо такой номер телефона зарегистрирован за другим человеком.
      */
     fun addPhone(name: String, phone: String): Boolean {
-        for (i in map.values) if (i.contains(phone)) return false
+        if (map.values.toString().contains(phone)) return false
         map[name]?.add(phone) ?: return false
         return true
     }
@@ -67,6 +68,7 @@ class PhoneBook() {
      * либо у него не было такого номера телефона.
      */
     fun removePhone(name: String, phone: String): Boolean {
+        println(map.values)
         map[name] ?: return false
         if (!map[name]?.contains(phone)!!) return false
         map[name]?.remove(phone)
@@ -84,26 +86,19 @@ class PhoneBook() {
      * Если такого номера нет в книге, вернуть null.
      */
     fun humanByPhone(phone: String): String? {
-        for ((key, value) in map) {
-            if (value.contains(phone)) return key
-        }
-        return null
+        if (!map.values.toString().contains(phone)) return null
+        val mapSafe = map.filterValues { it.contains(phone) }
+        return mapSafe.keys.first()
     }
+
 
     /**
      * Две телефонные книги равны, если в них хранится одинаковый набор людей,
      * и каждому человеку соответствует одинаковый набор телефонов.
      * Порядок людей / порядок телефонов в книге не должен иметь значения.
      */
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is PhoneBook) return false
-        for ((key, value) in map) {
-            if (!other.map.containsKey(key)) return false
-            if (other.map[key] != value) return false
-        }
-        return true
-    }
+    override fun equals(other: Any?): Boolean = other is PhoneBook && map == other.map
+
 
     override fun hashCode(): Int = map.hashCode()
 }
