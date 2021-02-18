@@ -42,6 +42,7 @@ class PhoneBook {
      */
     fun removeHuman(name: String): Boolean =
         if (name in book) {
+            for (i in book[name]!!) extraBook.remove(i)
             book.remove(name)
             true
         } else false
